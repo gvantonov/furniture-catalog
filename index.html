@@ -23,8 +23,8 @@
             background-color: #f2f2f2;
         }
         .thumbnail {
-            width: 100px;
-            height: 100px;
+            width: 200px;
+            height: 200px;
             cursor: pointer;
             object-fit: cover;
         }
@@ -117,7 +117,7 @@
             <tr>
                 <td align="right">2</td>
                 <td>Кресло в классическом стиле с рисунком листьев</td>
-                <td><img src="img/item201.JPG" class="thumbnail" data-images="img/item201.JPG,img/item202.JPG,img/item203.JPG,img/item204.JPG,img/item205.JPG,img/item206.JPG,img/item207.JPG,img/item208.JPG,img/item209.JPG» alt="Кресло"></td>
+                <td><img class="thumbnail" data-prefix="item2" alt="Кресло"></td>
                 <td>Кресло</td>
                 <td align="right">2</td>
                 <td>102x85x75</td>
@@ -129,7 +129,7 @@
             <tr>
                 <td align="right">3</td>
                 <td>Кресло в классическом стиле с мелким рисунком и резными элементами</td>
-                <td><img src="img/placeholder.jpg" class="thumbnail" data-images="img/item3-1.jpg" alt="Кресло"></td>
+                <td><img class="thumbnail" data-prefix="item3" alt="Кресло"></td>
                 <td>Кресло</td>
                 <td align="right">2</td>
                 <td>111x75x70</td>
@@ -141,7 +141,7 @@
             <tr>
                 <td align="right">4</td>
                 <td>Кресло в классическом стиле с тканевой обивкой и кожаной подушкой</td>
-                <td><img src="img/placeholder.jpg" class="thumbnail" data-images="img/item4-1.jpg" alt="Кресло"></td>
+                <td><img class="thumbnail" data-prefix="item4" alt="Кресло"></td>
                 <td>Кресло</td>
                 <td align="right">2</td>
                 <td>107x75x100</td>
@@ -1366,8 +1366,8 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+<script>
+        document.addEventListener('DOMContentLoaded', async () => {
             const thumbnails = document.querySelectorAll('.thumbnail');
             const modal = document.getElementById('galleryModal');
             const mainImage = document.getElementById('mainImage');
@@ -1378,9 +1378,27 @@
             let currentIndex = 0;
             let images = [];
 
+            // Загружаем JSON с изображениями
+            const response = await fetch('images.json');
+            const imageData = await response.json();
+
+            // Устанавливаем миниатюры
+            thumbnails.forEach(thumbnail => {
+                const prefix = thumbnail.getAttribute('data-prefix');
+                const prefixData = imageData.find(item => item.prefix === prefix);
+                if (prefixData && prefixData.images.length > 0) {
+                    thumbnail.src = prefixData.images[0]; // Первый файл для миниатюры
+                } else {
+                    thumbnail.src = 'img/placeholder.jpg'; // Запасной вариант
+                }
+            });
+
             thumbnails.forEach(thumbnail => {
                 thumbnail.addEventListener('click', () => {
-                    images = thumbnail.getAttribute('data-images').split(',');
+                    const prefix = thumbnail.getAttribute('data-prefix');
+                    const prefixData = imageData.find(item => item.prefix === prefix);
+                    images = prefixData ? prefixData.images : [];
+                    if (images.length === 0) return; // Если нет изображений, не открываем галерею
                     currentIndex = 0;
                     updateGallery();
                     modal.style.display = 'flex';
@@ -1432,5 +1450,4 @@
         });
     </script>
 </body>
-</html>
 </html>
