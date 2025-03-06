@@ -23,10 +23,10 @@
             background-color: #f2f2f2;
         }
         .thumbnail {
-            width: 50px;
-            height: 50px;
+            width: 300px; /* Фиксированная ширина миниатюры */
+            height: 300px; /* Фиксированная высота миниатюры */
             cursor: pointer;
-            object-fit: cover;
+            object-fit: cover; /* Сохраняет пропорции, обрезая лишнее */
         }
         .modal {
             display: none;
@@ -84,7 +84,7 @@
             <tr>
                 <td align="right">2</td>
                 <td>Кресло в классическом стиле с рисунком листьев</td>
-                <td><img src="img/img201.jpg" class="thumbnail" data-images="img/item201.jpg,img/item202,img/item203,img/item204,img/item205,img/item206,img/item207,img/item208,img/item209,img/item210» alt="Кресло"></td>
+                <td><img src="img/item201.JPG" class="thumbnail" data-images="img/item201.JPG,img/item202.JPG,img/item203.JPG,img/item204.JPG,img/item205.JPG,img/item206.JPG,img/item207.JPG,img/item208.JPG,img/item209.JPG» alt="Кресло"></td>
                 <td>Кресло</td>
                 <td align="right">2</td>
                 <td>102x85x75</td>
@@ -1323,7 +1323,7 @@
     </table>
 
     <!-- Модальное окно галереи -->
-    <div id="galleryModal" class="modal">
+   <div id="galleryModal" class="modal">
         <span class="close">×</span>
         <div class="modal-content" id="galleryContent"></div>
     </div>
