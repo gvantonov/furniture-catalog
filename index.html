@@ -1356,7 +1356,7 @@
     </table>
 
     <!-- Модальное окно галереи -->
- <div id="galleryModal" class="modal">
+<div id="galleryModal" class="modal">
         <span class="close">×</span>
         <div class="modal-content">
             <img id="mainImage" class="main-image" src="" alt="Main Image">
@@ -1378,8 +1378,6 @@
             let currentIndex = 0;
             let images = [];
 
-            console.log('Thumbnails found:', thumbnails); // Для отладки
-
             thumbnails.forEach(thumbnail => {
                 thumbnail.addEventListener('click', () => {
                     images = thumbnail.getAttribute('data-images').split(',');
@@ -1395,7 +1393,9 @@
                 images.forEach((imgSrc, index) => {
                     const img = document.createElement('img');
                     img.src = imgSrc;
-                    img.classList.add(index === currentIndex ? 'active' : '');
+                    if (index === currentIndex) {
+                        img.classList.add('active');
+                    }
                     img.addEventListener('click', () => {
                         currentIndex = index;
                         updateGallery();
@@ -1432,4 +1432,5 @@
         });
     </script>
 </body>
+</html>
 </html>
