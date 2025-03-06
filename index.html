@@ -1356,76 +1356,80 @@
     </table>
 
     <!-- Модальное окно галереи -->
-  <div id="galleryModal" class="modal">
+ <div id="galleryModal" class="modal">
         <span class="close">×</span>
         <div class="modal-content">
             <img id="mainImage" class="main-image" src="" alt="Main Image">
             <div class="thumbnail-gallery" id="thumbnailGallery"></div>
-            <span class="arrow arrow-left" id="arrowLeft">&#9664;</span>
-            <span class="arrow arrow-right" id="arrowRight">&#9654;</span>
+            <span class="arrow arrow-left" id="arrowLeft">◀</span>
+            <span class="arrow arrow-right" id="arrowRight">▶</span>
         </div>
     </div>
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    const modal = document.getElementById('galleryModal');
-    const mainImage = document.getElementById('mainImage');
-    const thumbnailGallery = document.getElementById('thumbnailGallery');
-    const closeBtn = document.querySelector('.close');
-    const arrowLeft = document.getElementById('arrowLeft');
-    const arrowRight = document.getElementById('arrowRight');
-    let currentIndex = 0;
-    let images = [];
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const modal = document.getElementById('galleryModal');
+            const mainImage = document.getElementById('mainImage');
+            const thumbnailGallery = document.getElementById('thumbnailGallery');
+            const closeBtn = document.querySelector('.close');
+            const arrowLeft = document.getElementById('arrowLeft');
+            const arrowRight = document.getElementById('arrowRight');
+            let currentIndex = 0;
+            let images = [];
 
-    thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener('click', () => {
-            images = thumbnail.getAttribute('data-images').split(',');
-            currentIndex = 0;
-            updateGallery();
-            modal.style.display = 'flex';
-        });
-    });
+            console.log('Thumbnails found:', thumbnails); // Для отладки
 
-    function updateGallery() {
-        mainImage.src = images[currentIndex];
-        thumbnailGallery.innerHTML = '';
-        images.forEach((imgSrc, index) => {
-            const img = document.createElement('img');
-            img.src = imgSrc;
-            img.classList.add(index === currentIndex ? 'active' : '');
-            img.addEventListener('click', () => {
-                currentIndex = index;
-                updateGallery();
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', () => {
+                    images = thumbnail.getAttribute('data-images').split(',');
+                    currentIndex = 0;
+                    updateGallery();
+                    modal.style.display = 'flex';
+                });
             });
-            thumbnailGallery.appendChild(img);
+
+            function updateGallery() {
+                mainImage.src = images[currentIndex];
+                thumbnailGallery.innerHTML = '';
+                images.forEach((imgSrc, index) => {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.classList.add(index === currentIndex ? 'active' : '');
+                    img.addEventListener('click', () => {
+                        currentIndex = index;
+                        updateGallery();
+                    });
+                    thumbnailGallery.appendChild(img);
+                });
+                arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
+                arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
+            }
+
+            arrowLeft.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateGallery();
+                }
+            });
+
+            arrowRight.addEventListener('click', () => {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    updateGallery();
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
         });
-        arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
-        arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
-    }
-
-    arrowLeft.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateGallery();
-        }
-    });
-
-    arrowRight.addEventListener('click', () => {
-        if (currentIndex < images.length - 1) {
-            currentIndex++;
-            updateGallery();
-        }
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-});
+    </script>
 </body>
 </html>
