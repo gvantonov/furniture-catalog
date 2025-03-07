@@ -42,16 +42,17 @@
         }
         .modal-content {
             position: relative;
-            background-color: #fff;
+            background-color: #333; /* Затемнённый фон */
             padding: 20px;
             border-radius: 5px;
-            max-width: 80%;
-            max-height: 80%;
+            max-width: 90%;
+            max-height: 90%;
             text-align: center;
+            color: #fff; /* Текст на фоне */
         }
         .main-image {
             max-width: 100%;
-            max-height: 60vh; /* Ограничиваем высоту главного изображения */
+            max-height: 80vh; /* Увеличен размер изображения */
             object-fit: contain;
         }
         .thumbnail-gallery {
@@ -59,32 +60,34 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            overflow-x: auto; /* Горизонтальная прокрутка, если миниатюр много */
+            overflow-x: auto;
         }
         .thumbnail-gallery img {
-            width: 60px;
-            height: 60px;
+            width: 80px; /* Увеличен размер миниатюр */
+            height: 80px;
             object-fit: cover;
             cursor: pointer;
             border: 2px solid transparent;
         }
         .thumbnail-gallery img.active {
-            border: 2px solid #007bff; /* Подсветка активной миниатюры */
+            border: 2px solid #007bff;
         }
         .arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
             font-size: 40px;
-            color: #fff;
+            color: black; /* Чёрные стрелки */
+            text-shadow: 0 0 5px white; /* Белая обводка для контраста */
             cursor: pointer;
             user-select: none;
+            z-index: 1001; /* Над изображением */
         }
         .arrow-left {
-            left: 20px;
+            left: -50px; /* Вынесено за пределы изображения */
         }
         .arrow-right {
-            right: 20px;
+            right: -50px; /* Вынесено за пределы изображения */
         }
         .close {
             position: absolute;
@@ -93,6 +96,22 @@
             font-size: 30px;
             color: #fff;
             cursor: pointer;
+        }
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        .fullscreen-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -1354,109 +1373,124 @@
         </tbody>
     </table>
 
-    <!-- Модальное окно галереи -->
-<div id="galleryModal" class="modal">
+<!-- Модальное окно галереи -->
+    <div id="galleryModal" class="modal">
         <span class="close">×</span>
         <div class="modal-content">
             <img id="mainImage" class="main-image" src="" alt="Main Image">
             <div class="thumbnail-gallery" id="thumbnailGallery"></div>
             <span class="arrow arrow-left" id="arrowLeft">◀</span>
             <span class="arrow arrow-right" id="arrowRight">▶</span>
+            <button class="fullscreen-btn" id="fullscreenBtn">Полноэкранный режим</button>
         </div>
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    const modal = document.getElementById('galleryModal');
-    const mainImage = document.getElementById('mainImage');
-    const thumbnailGallery = document.getElementById('thumbnailGallery');
-    const closeBtn = document.querySelector('.close');
-    const arrowLeft = document.getElementById('arrowLeft');
-    const arrowRight = document.getElementById('arrowRight');
-    let currentIndex = 0;
-    let images = [];
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const modal = document.getElementById('galleryModal');
+            const mainImage = document.getElementById('mainImage');
+            const thumbnailGallery = document.getElementById('thumbnailGallery');
+            const closeBtn = document.querySelector('.close');
+            const arrowLeft = document.getElementById('arrowLeft');
+            const arrowRight = document.getElementById('arrowRight');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            let currentIndex = 0;
+            let images = [];
 
-    let imageData = {};
-    try {
-        const response = await fetch('images.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        imageData = await response.json();
-    } catch (error) {
-        console.error('Ошибка загрузки images.json:', error);
-        // Fallback для всех миниатюр
-        thumbnails.forEach(thumbnail => {
-            thumbnail.src = 'img/placeholder.webp';
-        });
-        return; // Прерываем выполнение, если JSON не загружен
-    }
-
-    thumbnails.forEach(thumbnail => {
-        const prefix = thumbnail.getAttribute('data-prefix');
-        const imageList = imageData[prefix];
-        if (imageList && imageList.length > 0) {
-            thumbnail.src = imageList[0];
-        } else {
-            thumbnail.src = 'img/placeholder.webp';
-        }
-    });
-
-    thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener('click', () => {
-            const prefix = thumbnail.getAttribute('data-prefix');
-            images = imageData[prefix] || [];
-            if (images.length === 0) return;
-            currentIndex = 0;
-            updateGallery();
-            modal.style.display = 'flex';
-        });
-    });
-
-    function updateGallery() {
-        mainImage.src = images[currentIndex];
-        thumbnailGallery.innerHTML = '';
-        images.forEach((imgSrc, index) => {
-            const img = document.createElement('img');
-            img.src = imgSrc;
-            if (index === currentIndex) {
-                img.classList.add('active');
+            let imageData = {};
+            try {
+                const response = await fetch('images.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                imageData = await response.json();
+            } catch (error) {
+                console.error('Ошибка загрузки images.json:', error);
+                thumbnails.forEach(thumbnail => {
+                    thumbnail.src = 'img/placeholder.webp';
+                });
+                return;
             }
-            img.addEventListener('click', () => {
-                currentIndex = index;
-                updateGallery();
+
+            thumbnails.forEach(thumbnail => {
+                const prefix = thumbnail.getAttribute('data-prefix');
+                const imageList = imageData[prefix];
+                if (imageList && imageList.length > 0) {
+                    thumbnail.src = imageList[0];
+                } else {
+                    thumbnail.src = 'img/placeholder.webp';
+                }
             });
-            thumbnailGallery.appendChild(img);
+
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', () => {
+                    const prefix = thumbnail.getAttribute('data-prefix');
+                    images = imageData[prefix] || [];
+                    if (images.length === 0) return;
+                    currentIndex = 0;
+                    updateGallery();
+                    modal.style.display = 'flex';
+                });
+            });
+
+            function updateGallery() {
+                mainImage.src = images[currentIndex];
+                thumbnailGallery.innerHTML = '';
+                images.forEach((imgSrc, index) => {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    if (index === currentIndex) {
+                        img.classList.add('active');
+                    }
+                    img.addEventListener('click', () => {
+                        currentIndex = index;
+                        updateGallery();
+                    });
+                    thumbnailGallery.appendChild(img);
+                });
+                arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
+                arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
+            }
+
+            arrowLeft.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateGallery();
+                }
+            });
+
+            arrowRight.addEventListener('click', () => {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    updateGallery();
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Полноэкранный режим
+            fullscreenBtn.addEventListener('click', () => {
+                if (mainImage.requestFullscreen) {
+                    mainImage.requestFullscreen();
+                } else if (mainImage.mozRequestFullScreen) { // Firefox
+                    mainImage.mozRequestFullScreen();
+                } else if (mainImage.webkitRequestFullscreen) { // Chrome, Safari
+                    mainImage.webkitRequestFullscreen();
+                } else if (mainImage.msRequestFullscreen) { // IE/Edge
+                    mainImage.msRequestFullscreen();
+                }
+            });
         });
-        arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
-        arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
-    }
-
-    arrowLeft.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateGallery();
-        }
-    });
-
-    arrowRight.addEventListener('click', () => {
-        if (currentIndex < images.length - 1) {
-            currentIndex++;
-            updateGallery();
-        }
-    });
-
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-});
-</script>
+    </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91cad95afc5cbcfe',t:'MTc0MTM1ODQzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
