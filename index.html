@@ -1377,26 +1377,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentIndex = 0;
     let images = [];
 
-    // Загружаем JSON с изображениями
-    const response = await fetch('images.json');
-    const imageData = await response.json();
+    let imageData = {};
+    try {
+        const response = await fetch('images.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        imageData = await response.json();
+    } catch (error) {
+        console.error('Ошибка загрузки images.json:', error);
+        // Fallback для всех миниатюр
+        thumbnails.forEach(thumbnail => {
+            thumbnail.src = 'img/placeholder.webp';
+        });
+        return; // Прерываем выполнение, если JSON не загружен
+    }
 
-    // Устанавливаем миниатюры
     thumbnails.forEach(thumbnail => {
         const prefix = thumbnail.getAttribute('data-prefix');
-        const imageList = imageData[prefix]; // Доступ к массиву по ключу
+        const imageList = imageData[prefix];
         if (imageList && imageList.length > 0) {
-            thumbnail.src = imageList[0]; // Первый файл для миниатюры
+            thumbnail.src = imageList[0];
         } else {
-            thumbnail.src = 'img/placeholder.webp'; // Запасной вариант
+            thumbnail.src = 'img/placeholder.webp';
         }
     });
 
     thumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', () => {
             const prefix = thumbnail.getAttribute('data-prefix');
-            images = imageData[prefix] || []; // Получаем массив изображений или пустой массив
-            if (images.length === 0) return; // Если нет изображений, не открываем галерею
+            images = imageData[prefix] || [];
+            if (images.length === 0) return;
             currentIndex = 0;
             updateGallery();
             modal.style.display = 'flex';
