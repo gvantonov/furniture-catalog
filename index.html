@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Каталог мебели</title>
@@ -135,6 +133,9 @@
             background-color: #218838;
         }
     </style>
+    <!-- Подключение Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js" type="module"></script>
 </head>
 <body>
     <h1>Каталог мебели</h1>
@@ -157,22 +158,25 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Импорт Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getFirestore, doc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
- // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
-  authDomain: "furniture-catalog-35e3e.firebaseapp.com",
-  projectId: "furniture-catalog-35e3e",
-  storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
-  messagingSenderId: "705330640295",
-  appId: "1:705330640295:web:055306fbfc3f95c36cb282",
-  measurementId: "G-98YM4XPHN7"
-};
+        // Конфигурация Firebase (замените на вашу)
+        const firebaseConfig = {
+        apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
+	authDomain: "furniture-catalog-35e3e.firebaseapp.com",
+	projectId: "furniture-catalog-35e3e",
+	storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
+	messagingSenderId: "705330640295",
+	appId: "1:705330640295:web:055306fbfc3f95c36cb282",
+	measurementId: "G-98YM4XPHN7"
+        };
 
-	// Initialize Firebase
-	const app = initializeApp(firebaseConfig);
-	const analytics = getAnalytics(app);
+        // Инициализация Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         document.addEventListener('DOMContentLoaded', async () => {
             const table = document.getElementById('furnitureTable');
@@ -282,16 +286,16 @@ const firebaseConfig = {
             tfoot.appendChild(totalRow);
 
             // Сохранение изменений
-saveButton.addEventListener('click', async () => {
-    try {
-        await db.collection('furniture').doc('catalog').set({ data: furnitureData });
-        alert('Данные сохранены в Firebase!');
-    } catch (error) {
-        console.error('Ошибка сохранения:', error);
-        alert('Ошибка при сохранении данных. Данные будут выведены в консоль.');
-        console.log(JSON.stringify(furnitureData, null, 2));
-    }
-});
+            saveButton.addEventListener('click', async () => {
+                try {
+                    await setDoc(doc(db, 'furniture', 'catalog'), { data: furnitureData });
+                    alert('Данные сохранены в Firebase!');
+                } catch (error) {
+                    console.error('Ошибка сохранения:', error);
+                    alert('Ошибка при сохранении данных. Данные выведены в консоль.');
+                    console.log(JSON.stringify(furnitureData, null, 2));
+                }
+            });
 
             // Код для галереи
             const thumbnails = document.querySelectorAll('.thumbnail');
