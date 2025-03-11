@@ -14,8 +14,15 @@ const firebaseConfig = {
 };
 
 // Инициализация Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app, db;
+try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    console.log("Firebase инициализирован успешно.");
+} catch (error) {
+    console.error("Ошибка инициализации Firebase:", error);
+    alert("Ошибка подключения к Firebase. Проверьте конфигурацию в script.js.");
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const table = document.getElementById('furnitureTable');
@@ -54,12 +61,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('images.json');
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.warn('Файл images.json не найден или пуст. Используются заглушки.');
+            imageData = {}; // Заглушка, если файл отсутствует
+        } else {
+            imageData = await response.json();
         }
-        imageData = await response.json();
     } catch (error) {
         console.error('Ошибка загрузки images.json:', error);
-        return;
+        imageData = {}; // Заглушка при ошибке
     }
 
     // Динамическое создание заголовков
@@ -79,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers.forEach(header => {
             const td = document.createElement('td');
             if (header === 'Фото') {
-                const prefix = item['data-prefix'] || `item${item['№№']}`; // Гарантируем наличие prefix
+                const prefix = item['data-prefix'] || `item${item['№№']}`;
                 const img = document.createElement('img');
                 img.className = 'thumbnail';
                 img.setAttribute('data-prefix', prefix);
@@ -125,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     totalValueCell.style.textAlign = 'right';
     totalValueCell.classList.add('total-cost');
     totalRow.appendChild(totalLabelCell);
-    totalRow.appendChild(totalValueCell); // Исправлено: добавляем totalValueCell в totalRow
+    totalRow.appendChild(totalValueCell);
     tfoot.appendChild(totalRow);
 
     // Открытие модального окна для ввода данных пользователя
@@ -138,11 +147,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
         const userName = document.getElementById('userName').value.trim();
         const userPhone = document.getElementById('userPhone').value.trim();
+
         if (!userName) {
             alert('Пожалуйста, введите ваше имя.');
             return;
         }
+
+        if (!db) {
+            alert('Firebase не инициализирован. Проверьте конфигурацию.');
+            console.error('Firestore не доступен.');
+            return;
+        }
+
         try {
+            console.log('Отправка данных:', { userName, userPhone, data: furnitureData });
             const submissionData = {
                 userName: userName,
                 userPhone: userPhone,
@@ -150,9 +168,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 timestamp: new Date().toISOString()
             };
             await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
-            alert('Данные успешно сохранены!');
-            userInfoModal.style.display = 'none';
-            userInfoForm.reset();
+
+            // Заменяем содержимое модального окна на сообщение об успешной отправке
+            const modalContent = userInfoModal.querySelector('.modal-content');
+            modalContent.innerHTML = `
+                <span class="close">×</span>
+                <div class="success-message">
+                    <p>Ваше предложение по стоимости направлено продавцу.</p>
+                    <p>Если у вас есть дополнительные вопросы — напишите в WhatsApp</p>
+                    <a href="http://wa.me/79153555202" target="_blank" class="whatsapp-link">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3Cpath fill='%2325D366' d='M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.218 1.617 6.042L0 24l6.058-1.587A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.874 0-3.627-.497-5.144-1.357l-.357-.212-3.6.943.961-3.518-.226-.37A9.956 9.956 0 0 1 2 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.618-4.943c-.308-.154-1.827-.904-2.11-.998-.282-.094-.488-.146-.694.146-.206.292-.798.998-.975 1.202-.177.204-.354.22-.652.073-.297-.147-1.254-.46-2.39-1.467-.883-.784-1.48-1.753-1.657-2.045-.177-.292-.018-.45.132-.596.135-.132.304-.346.456-.526.153-.18.206-.308.31-.518.103-.21.051-.394-.026-.553-.077-.16-.694-1.672-.952-2.29-.252-.598-.508-.517-.694-.517-.187 0-.399-.02-.611-.02-.212 0-.558.073-.852.368-.294.295-1.126 1.1-1.126 2.682 0 1.582 1.152 3.11 1.314 3.324.161.214 2.267 3.465 5.494 4.858.766.332 1.366.531 1.834.681.772.247 1.475.212 2.03.129.619-.094 1.827-.747 2.084-1.467.257-.72.257-1.34.18-1.467-.077-.127-.283-.201-.591-.355z'/%3E%3C/svg%3E" alt="WhatsApp" class="whatsapp-icon">
+                        Написать
+                    </a>
+                </div>
+            `;
+
+            // Обновляем обработчик для кнопки закрытия, так как содержимое изменилось
+            const newCloseBtn = modalContent.querySelector('.close');
+            newCloseBtn.addEventListener('click', () => {
+                userInfoModal.style.display = 'none';
+            });
         } catch (error) {
             console.error('Ошибка сохранения:', error);
             alert('Ошибка при сохранении данных. Данные выведены в консоль.');
