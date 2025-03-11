@@ -2,7 +2,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
-// Конфигурация Firebase (замените на вашу)
+// Конфигурация Firebase 
 const firebaseConfig = {
   apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
   authDomain: "furniture-catalog-35e3e.firebaseapp.com",
@@ -12,6 +12,10 @@ const firebaseConfig = {
   appId: "1:705330640295:web:055306fbfc3f95c36cb282",
   measurementId: "G-98YM4XPHN7"
 };
+
+// Конфигурация Telegram
+const telegramToken = "7721721089:AAE76FiIOPsh9ztUeHGaw3OBIpxyIEvEyRo"; 
+const telegramChatId = "44679768"; 
 
 // Инициализация Firebase
 let app, db;
@@ -62,13 +66,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch('images.json');
         if (!response.ok) {
             console.warn('Файл images.json не найден или пуст. Используются заглушки.');
-            imageData = {}; // Заглушка, если файл отсутствует
+            imageData = {};
         } else {
             imageData = await response.json();
         }
     } catch (error) {
         console.error('Ошибка загрузки images.json:', error);
-        imageData = {}; // Заглушка при ошибке
+        imageData = {};
     }
 
     // Динамическое создание заголовков
@@ -169,6 +173,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
 
+            // Отправка уведомления в Telegram
+            const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
+            const itemsWithCustomPrice = furnitureData.filter(item => item['Пользовательская оценка'] && item['Пользовательская оценка'].trim() !== '');
+            let telegramMessage = `🔔 Новые ценовые предложения от ${userName} (${userPhone})\n`;
+            telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
+            itemsWithCustomPrice.forEach(item => {
+                telegramMessage += `- №: ${item['№№']}\n`;
+                telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
+                telegramMessage += `  Предложенная стоимость: ${item['Пользовательская оценка'] || 'Не указано'} ₽\n\n`;
+            });
+
+            await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: telegramChatId,
+                    text: telegramMessage
+                })
+            });
+
+            // Генерация и скачивание CSV
+            const csvHeaders = ['№№', 'Название', 'Пользовательская оценка'];
+            const csvRows = itemsWithCustomPrice.map(item => [
+                item['№№'],
+                item['Название'] || '',
+                item['Пользовательская оценка'] || ''
+            ]);
+            const csvContent = [
+                csvHeaders.join(';'),
+                ...csvRows.map(row => row.join(';'))
+            ].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `price_proposals_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
             // Заменяем содержимое модального окна на сообщение об успешной отправке
             const modalContent = userInfoModal.querySelector('.modal-content');
             modalContent.innerHTML = `
@@ -183,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
 
-            // Обновляем обработчик для кнопки закрытия, так как содержимое изменилось
+            // Обновляем обработчик для кнопки закрытия
             const newCloseBtn = modalContent.querySelector('.close');
             newCloseBtn.addEventListener('click', () => {
                 userInfoModal.style.display = 'none';
