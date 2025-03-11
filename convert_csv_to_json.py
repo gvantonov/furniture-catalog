@@ -8,12 +8,8 @@ json_file = 'furniture_catalog.json'
 data = []
 with open(csv_file, 'r', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile, delimiter=';')
-    # Выводим заголовки для отладки
-    print("Заголовки столбцов:", reader.fieldnames)
     # Нормализуем заголовки, заменяя неразрывные пробелы и лишние пробелы
     fieldnames = [field.strip().replace('\xa0', ' ') for field in reader.fieldnames]
-    print("Нормализованные заголовки:", fieldnames)
-    # Создаём новый словарь с нормализованными ключами
     for row in reader:
         normalized_row = {fieldnames[i]: value for i, value in enumerate(row.values())}
         # Пропускаем строку с итоговой стоимостью (пустой №№)
@@ -22,8 +18,8 @@ with open(csv_file, 'r', encoding='utf-8') as csvfile:
         # Удаляем лишние пробелы и преобразуем в нужный формат
         for key in normalized_row:
             normalized_row[key] = normalized_row[key].strip() if normalized_row[key] else ''
-        # Добавляем data-prefix для совместимости с галереей
-        normalized_row['data-prefix'] = normalized_row.pop('Фото') or f'item{normalized_row["№№"]}'
+        # Сохраняем data-prefix для галереи, но оставляем Фото для отображения
+        normalized_row['data-prefix'] = normalized_row['Фото'] or f'item{normalized_row["№№"]}'
         # Добавляем пустой столбец для пользовательской оценки
         normalized_row['Пользовательская оценка'] = ''
         # Преобразуем стоимость в число
@@ -36,9 +32,19 @@ with open(csv_file, 'r', encoding='utf-8') as csvfile:
             normalized_row[cost_key] = 0
         data.append(normalized_row)
 
+# Сортируем ключи для нужного порядка столбцов
+ordered_data = []
+desired_order = [
+    '№№', 'Фото', 'Название', 'Категория', 'Количество, шт.', 'Размеры (ВхШхГ)',
+    'Материалы', 'Наименование', 'Заметки', 'Гарнитур',
+    'Оценка (агент TwoTables), за 1 шт.', 'Пользовательская оценка', 'data-prefix'
+]
+for row in data:
+    ordered_row = {key: row[key] for key in desired_order}
+    ordered_data.append(ordered_row)
+
 # Сохраняем в JSON
 with open(json_file, 'w', encoding='utf-8') as jsonfile:
-    json.dump(data, jsonfile, ensure_ascii=False, indent=4)
+    json.dump(ordered_data, jsonfile, ensure_ascii=False, indent=4)
 
 print(f"Файл {json_file} успешно создан!")
-
