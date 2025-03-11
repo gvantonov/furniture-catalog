@@ -13,10 +13,6 @@ const firebaseConfig = {
   measurementId: "G-98YM4XPHN7"
 };
 
-// Конфигурация Telegram
-const telegramToken = "7721721089:AAFhzVuDwBI9tDKykG1gPGH-37D1lLRo4ts"; 
-const telegramChatId = "44679768"; 
-
 // Инициализация Firebase
 let app, db;
 try {
@@ -173,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
 
-            // Отправка уведомления в Telegram
+            // Отправка уведомления в Telegram через прокси
             const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
             const itemsWithCustomPrice = furnitureData.filter(item => item['Пользовательская оценка'] && item['Пользовательская оценка'].trim() !== '');
             let telegramMessage = `🔔 Новые ценовые предложения от ${userName} (${userPhone})\n`;
@@ -184,14 +180,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 telegramMessage += `  Предложенная стоимость: ${item['Пользовательская оценка'] || 'Не указано'} ₽\n\n`;
             });
 
-            await fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: telegramChatId,
-                    text: telegramMessage
-                })
-            });
+            // Отправка через iframe к прокси
+            const iframe = document.createElement('iframe');
+            iframe.src = 'telegram-proxy.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            iframe.contentWindow.postMessage({ message: telegramMessage }, 'https://gvantonov.github.io');
 
             // Генерация и скачивание CSV
             const csvHeaders = ['№№', 'Название', 'Пользовательская оценка'];
