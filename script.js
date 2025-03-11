@@ -14,7 +14,7 @@ const firebaseConfig = {
 };
 
 // Конфигурация Telegram
-const telegramToken = "7721721089:AAE76FiIOPsh9ztUeHGaw3OBIpxyIEvEyRo"; 
+const telegramToken = "7721721089:AAFhzVuDwBI9tDKykG1gPGH-37D1lLRo4ts"; 
 const telegramChatId = "44679768"; 
 
 // Инициализация Firebase
