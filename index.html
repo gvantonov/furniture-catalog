@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; object-src 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; object-src 'none'; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com; img-src 'self' https://*.github.io data:;">
     <title>Каталог мебели</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -37,10 +37,10 @@
             <span class="close">×</span>
             <h2>Введите ваши данные</h2>
             <form id="userInfoForm">
-                <label for="userName">Имя (обязательно):</label><br>
-                <input type="text" id="userName" name="userName" autocomplete="name" required><br>
-                <label for="userPhone">Телефон (необязательно):</label><br>
-                <input type="tel" id="userPhone" name="userPhone" autocomplete="tel"><br>
+                <label for="userName">Имя:</label><br>
+                <input type="text" id="userName" name="userName" autocomplete="name" required placeholder="Имя (обязательно)"><br>
+                <label for="userPhone">Телефон:</label><br>
+                <input type="tel" id="userPhone" name="userPhone" autocomplete="tel" placeholder="Телефон (необязательно)"><br>
                 <button type="submit">Отправить</button>
             </form>
         </div>
