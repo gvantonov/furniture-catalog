@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         headers.forEach(header => {
             const td = document.createElement('td');
             if (header === 'Фото') {
-                const prefix = item['data-prefix'] || `item${item['№№']}`;
+                const prefix = item['data-prefix'] || `item${item['№№']}`; // Гарантируем наличие prefix
                 const img = document.createElement('img');
                 img.className = 'thumbnail';
                 img.setAttribute('data-prefix', prefix);
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
                 td.appendChild(img);
             } else if (header === 'Оценка (агент TwoTables), за 1 шт.') {
-                const cost = item[header];
+                const cost = item[header] || 0;
                 td.textContent = cost > 0 ? cost.toLocaleString('ru-RU') + ' ₽' : '';
                 td.style.textAlign = 'right';
                 const quantity = parseInt(item['Количество, шт.']) || 1;
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     totalValueCell.style.textAlign = 'right';
     totalValueCell.classList.add('total-cost');
     totalRow.appendChild(totalLabelCell);
-    totalValueCell.appendChild(totalValueCell); // Исправлено: totalRow.appendChild(totalValueCell)
+    totalRow.appendChild(totalValueCell); // Исправлено: добавляем totalValueCell в totalRow
     tfoot.appendChild(totalRow);
 
     // Открытие модального окна для ввода данных пользователя
