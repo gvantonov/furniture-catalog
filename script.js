@@ -4,12 +4,13 @@ import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.
 
 // Конфигурация Firebase (замените на вашу)
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "furniture-catalog.firebaseapp.com",
-    projectId: "furniture-catalog",
-    storageBucket: "furniture-catalog.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
+  authDomain: "furniture-catalog-35e3e.firebaseapp.com",
+  projectId: "furniture-catalog-35e3e",
+  storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
+  messagingSenderId: "705330640295",
+  appId: "1:705330640295:web:055306fbfc3f95c36cb282",
+  measurementId: "G-98YM4XPHN7"
 };
 
 // Инициализация Firebase
