@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; object-src 'none';">
     <title>Каталог мебели</title>
     <style>
         body {
@@ -158,8 +159,8 @@
         }
     </style>
     <!-- Подключение Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js" type="module"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js" type="module"></script>
 </head>
 <body>
     <h1>Каталог мебели</h1>
@@ -192,9 +193,9 @@
             <h2>Введите ваши данные</h2>
             <form id="userInfoForm">
                 <label for="userName">Имя (обязательно):</label><br>
-                <input type="text" id="userName" name="userName" required style="width: 100%; padding: 8px; margin: 8px 0;"><br>
+                <input type="text" id="userName" name="userName" autocomplete="name" required style="width: 100%; padding: 8px; margin: 8px 0;"><br>
                 <label for="userPhone">Телефон (необязательно):</label><br>
-                <input type="tel" id="userPhone" name="userPhone" style="width: 100%; padding: 8px; margin: 8px 0;"><br>
+                <input type="tel" id="userPhone" name="userPhone" autocomplete="tel" style="width: 100%; padding: 8px; margin: 8px 0;"><br>
                 <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px;">Отправить</button>
             </form>
         </div>
@@ -202,8 +203,8 @@
 
     <script type="module">
         // Импорт Firebase
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
         // Конфигурация Firebase (замените на вашу)
         const firebaseConfig = {
@@ -281,12 +282,13 @@
                 headers.forEach(header => {
                     const td = document.createElement('td');
                     if (header === 'Фото') {
+                        const prefix = item['data-prefix'] || `item${item['№№']}`;
                         const img = document.createElement('img');
                         img.className = 'thumbnail';
-                        img.setAttribute('data-prefix', item['data-prefix']);
+                        img.setAttribute('data-prefix', prefix);
                         img.setAttribute('loading', 'lazy');
-                        img.setAttribute('alt', item['Название']);
-                        const imageList = imageData[item['data-prefix']] || [];
+                        img.setAttribute('alt', item['Название'] || 'Изображение');
+                        const imageList = imageData[prefix] || [];
                         img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
                         td.appendChild(img);
                     } else if (header === 'Оценка (агент TwoTables), за 1 шт.') {
@@ -326,7 +328,7 @@
             totalValueCell.style.textAlign = 'right';
             totalValueCell.classList.add('total-cost');
             totalRow.appendChild(totalLabelCell);
-            totalRow.appendChild(totalValueCell);
+            totalValueCell.appendChild(totalValueCell);
             tfoot.appendChild(totalRow);
 
             // Открытие модального окна для ввода данных пользователя
@@ -375,7 +377,7 @@
             const thumbnails = document.querySelectorAll('.thumbnail');
             thumbnails.forEach(thumbnail => {
                 const prefix = thumbnail.getAttribute('data-prefix');
-                const imageList = imageData[prefix];
+                const imageList = imageData[prefix] || [];
                 if (imageList && imageList.length > 0) {
                     thumbnail.src = imageList[0];
                 } else {
