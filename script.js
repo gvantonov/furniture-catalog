@@ -2,15 +2,15 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
-// Конфигурация Firebase 
+// Конфигурация Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
-  authDomain: "furniture-catalog-35e3e.firebaseapp.com",
-  projectId: "furniture-catalog-35e3e",
-  storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
-  messagingSenderId: "705330640295",
-  appId: "1:705330640295:web:055306fbfc3f95c36cb282",
-  measurementId: "G-98YM4XPHN7"
+    apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
+    authDomain: "furniture-catalog-35e3e.firebaseapp.com",
+    projectId: "furniture-catalog-35e3e",
+    storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
+    messagingSenderId: "705330640295",
+    appId: "1:705330640295:web:055306fbfc3f95c36cb282",
+    measurementId: "G-98YM4XPHN7"
 };
 
 // Инициализация Firebase
@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const row = document.createElement('tr');
         headers.forEach(header => {
             const td = document.createElement('td');
+            td.setAttribute('data-label', header); // Добавляем data-label для адаптивности
             if (header === 'Фото') {
                 const prefix = item['data-prefix'] || `item${item['№№']}`;
                 const img = document.createElement('img');
@@ -143,87 +144,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Сохранение данных после ввода имени и телефона
-    // ... (предыдущий код остается без изменений до userInfoForm.addEventListener)
+    userInfoForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userName = document.getElementById('userName').value.trim();
+        const userPhone = document.getElementById('userPhone').value.trim();
 
-userInfoForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const userName = document.getElementById('userName').value.trim();
-    const userPhone = document.getElementById('userPhone').value.trim();
-
-    if (!userName) {
-        alert('Пожалуйста, введите ваше имя.');
-        return;
-    }
-
-    if (!db) {
-        alert('Firebase не инициализирован. Проверьте конфигурацию.');
-        console.error('Firestore не доступен.');
-        return;
-    }
-
-    try {
-        console.log('Отправка данных:', { userName, userPhone, data: furnitureData });
-        const submissionData = {
-            userName: userName,
-            userPhone: userPhone,
-            data: furnitureData,
-            timestamp: new Date().toISOString()
-        };
-        await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
-
-        // Формирование сообщения для Telegram
-        const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
-        const itemsWithCustomPrice = furnitureData.filter(item => item['Пользовательская оценка'] && item['Пользовательская оценка'].trim() !== '');
-        let telegramMessage = `🔔 Новые ценовые предложения от ${userName} (${userPhone})\n`;
-        telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
-        if (itemsWithCustomPrice.length > 0) {
-            itemsWithCustomPrice.forEach(item => {
-                telegramMessage += `- №: ${item['№№']}\n`;
-                telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
-                telegramMessage += `  Предложенная стоимость: ${item['Пользовательская оценка'] || 'Не указано'} ₽\n\n`;
-            });
-        } else {
-            telegramMessage += 'Нет предложений по стоимости.\n';
+        if (!userName) {
+            alert('Пожалуйста, введите ваше имя.');
+            return;
         }
-        console.log('Telegram message:', telegramMessage); // Отладка
 
-        // Отправка через iframe к прокси
-        const iframe = document.createElement('iframe');
-        iframe.src = 'telegram-proxy.html';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        iframe.onload = () => {
-            console.log('Iframe loaded, sending message:', telegramMessage);
-            iframe.contentWindow.postMessage({ message: telegramMessage }, 'https://gvantonov.github.io');
-        };
+        if (!db) {
+            alert('Firebase не инициализирован. Проверьте конфигурацию.');
+            console.error('Firestore не доступен.');
+            return;
+        }
 
-        // Заменяем содержимое модального окна на сообщение об успешной отправке
-        const modalContent = userInfoModal.querySelector('.modal-content');
-        modalContent.innerHTML = `
-            <span class="close">×</span>
-            <div class="success-message">
-                <p>Ваше предложение по стоимости направлено продавцу.</p>
-                <p>Если у вас есть дополнительные вопросы — напишите в WhatsApp</p>
-                <a href="http://wa.me/79153555202" target="_blank" class="whatsapp-link">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3Cpath fill='%2325D366' d='M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.218 1.617 6.042L0 24l6.058-1.587A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.874 0-3.627-.497-5.144-1.357l-.357-.212-3.6.943.961-3.518-.226-.37A9.956 9.956 0 0 1 2 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.618-4.943c-.308-.154-1.827-.904-2.11-.998-.282-.094-.488-.146-.694.146-.206.292-.798.998-.975 1.202-.177.204-.354.22-.652.073-.297-.147-1.254-.46-2.39-1.467-.883-.784-1.48-1.753-1.657-2.045-.177-.292-.018-.45.132-.596.135-.132.304-.346.456-.526.153-.18.206-.308.31-.518.103-.21.051-.394-.026-.553-.077-.16-.694-1.672-.952-2.29-.252-.598-.508-.517-.694-.517-.187 0-.399-.02-.611-.02-.212 0-.558.073-.852.368-.294.295-1.126 1.1-1.126 2.682 0 1.582 1.152 3.11 1.314 3.324.161.214 2.267 3.465 5.494 4.858.766.332 1.366.531 1.834.681.772.247 1.475.212 2.03.129.619-.094 1.827-.747 2.084-1.467.257-.72.257-1.34.18-1.467-.077-.127-.283-.201-.591-.355z'/%3E%3C/svg%3E" alt="WhatsApp" class="whatsapp-icon">
-                    Написать
-                </a>
-            </div>
-        `;
+        try {
+            console.log('Отправка данных:', { userName, userPhone, data: furnitureData });
+            const submissionData = {
+                userName: userName,
+                userPhone: userPhone,
+                data: furnitureData,
+                timestamp: new Date().toISOString()
+            };
+            await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
 
-        // Обновляем обработчик для кнопки закрытия
-        const newCloseBtn = modalContent.querySelector('.close');
-        newCloseBtn.addEventListener('click', () => {
-            userInfoModal.style.display = 'none';
-        });
-    } catch (error) {
-        console.error('Ошибка сохранения:', error);
-        alert('Ошибка при сохранении данных. Данные выведены в консоль.');
-        console.log(JSON.stringify({ userName, userPhone, data: furnitureData }, null, 2));
-    }
-});
+            // Формирование сообщения для Telegram
+            const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
+            const itemsWithCustomPrice = furnitureData.filter(item => item['Пользовательская оценка'] && item['Пользовательская оценка'].trim() !== '');
+            let telegramMessage = `🔔 Новые ценовые предложения от ${userName} (${userPhone})\n`;
+            telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
+            if (itemsWithCustomPrice.length > 0) {
+                itemsWithCustomPrice.forEach(item => {
+                    telegramMessage += `- №: ${item['№№']}\n`;
+                    telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
+                    telegramMessage += `  Предложенная стоимость: ${item['Пользовательская оценка'] || 'Не указано'} ₽\n\n`;
+                });
+            } else {
+                telegramMessage += 'Нет предложений по стоимости.\n';
+            }
+            console.log('Telegram message:', telegramMessage); // Отладка
 
-  userInfoCloseBtn.addEventListener('click', () => {
+            // Отправка через iframe к прокси
+            const iframe = document.createElement('iframe');
+            iframe.src = 'telegram-proxy.html';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            iframe.onload = () => {
+                console.log('Iframe loaded, sending message:', telegramMessage);
+                iframe.contentWindow.postMessage({ message: telegramMessage }, 'https://gvantonov.github.io');
+            };
+
+            // Заменяем содержимое модального окна на сообщение об успешной отправке
+            const modalContent = userInfoModal.querySelector('.modal-content');
+            modalContent.innerHTML = `
+                <span class="close">×</span>
+                <div class="success-message">
+                    <p>Ваше предложение по стоимости направлено продавцу.</p>
+                    <p>Если у вас есть дополнительные вопросы — напишите в WhatsApp</p>
+                    <a href="http://wa.me/79153555202" target="_blank" class="whatsapp-link">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3Cpath fill='%2325D366' d='M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.218 1.617 6.042L0 24l6.058-1.587A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.874 0-3.627-.497-5.144-1.357l-.357-.212-3.6.943.961-3.518-.226-.37A9.956 9.956 0 0 1 2 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.618-4.943c-.308-.154-1.827-.904-2.11-.998-.282-.094-.488-.146-.694.146-.206.292-.798.998-.975 1.202-.177.204-.354.22-.652.073-.297-.147-1.254-.46-2.39-1.467-.883-.784-1.48-1.753-1.657-2.045-.177-.292-.018-.45.132-.596.135-.132.304-.346.456-.526.153-.18.206-.308.31-.518.103-.21.051-.394-.026-.553-.077-.16-.694-1.672-.952-2.29-.252-.598-.508-.517-.694-.517-.187 0-.399-.02-.611-.02-.212 0-.558.073-.852.368-.294.295-1.126 1.1-1.126 2.682 0 1.582 1.152 3.11 1.314 3.324.161.214 2.267 3.465 5.494 4.858.766.332 1.366.531 1.834.681.772.247 1.475.212 2.03.129.619-.094 1.827-.747 2.084-1.467.257-.72.257-1.34.18-1.467-.077-.127-.283-.201-.591-.355z'/%3E%3C/svg%3E" alt="WhatsApp" class="whatsapp-icon">
+                        Написать
+                    </a>
+                </div>
+            `;
+
+            // Обновляем обработчик для кнопки закрытия
+            const newCloseBtn = modalContent.querySelector('.close');
+            newCloseBtn.addEventListener('click', () => {
+                userInfoModal.style.display = 'none';
+            });
+        } catch (error) {
+            console.error('Ошибка сохранения:', error);
+            alert('Ошибка при сохранении данных. Данные выведены в консоль.');
+            console.log(JSON.stringify({ userName, userPhone, data: furnitureData }, null, 2));
+        }
+    });
+
+    userInfoCloseBtn.addEventListener('click', () => {
         userInfoModal.style.display = 'none';
     });
 

@@ -1,26 +1,46 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Запрещаем горизонтальную прокрутку на уровне body */
 }
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
 table {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    table-layout: auto; /* Позволяет колонкам адаптироваться */
 }
-th, td {
+
+th,
+td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
+    box-sizing: border-box;
+    word-wrap: break-word; /* Перенос текста в ячейках */
+    white-space: normal; /* Разрешаем перенос текста */
 }
+
 th {
     background-color: #f2f2f2;
 }
+
 .thumbnail {
     width: 200px;
     height: 200px;
     cursor: pointer;
     object-fit: cover;
 }
+
 .modal {
     display: none;
     position: fixed;
@@ -33,21 +53,25 @@ th {
     align-items: center;
     z-index: 1000;
 }
+
 .modal-content {
     position: relative;
     background-color: #333;
     padding: 20px;
     border-radius: 5px;
     max-width: 90%;
-    max-height: 90%;
+    max-height: 90vh;
     text-align: center;
     color: #fff;
+    overflow-y: auto; /* Прокрутка внутри модального окна при необходимости */
 }
+
 .main-image {
     max-width: 100%;
     max-height: 80vh;
     object-fit: contain;
 }
+
 .thumbnail-gallery {
     margin-top: 10px;
     display: flex;
@@ -55,6 +79,7 @@ th {
     gap: 10px;
     overflow-x: auto;
 }
+
 .thumbnail-gallery img {
     width: 80px;
     height: 80px;
@@ -62,9 +87,11 @@ th {
     cursor: pointer;
     border: 2px solid transparent;
 }
+
 .thumbnail-gallery img.active {
     border: 2px solid #007bff;
 }
+
 .arrow {
     position: absolute;
     top: 50%;
@@ -76,12 +103,15 @@ th {
     user-select: none;
     z-index: 1001;
 }
+
 .arrow-left {
     left: -50px;
 }
+
 .arrow-right {
     right: -50px;
 }
+
 .close {
     position: absolute;
     top: 10px;
@@ -90,6 +120,7 @@ th {
     color: #fff;
     cursor: pointer;
 }
+
 .fullscreen-btn {
     position: absolute;
     bottom: 20px;
@@ -103,13 +134,16 @@ th {
     cursor: pointer;
     z-index: 1001;
 }
+
 .fullscreen-btn:hover {
     background-color: #0056b3;
 }
+
 .total-cost {
     font-weight: bold;
     background-color: #f9f9f9;
 }
+
 .editable {
     background-color: #f8f9fa;
     border: 1px solid #ced4da;
@@ -117,14 +151,17 @@ th {
     min-height: 24px;
     padding: 2px 4px;
 }
+
 .editable:hover {
     background-color: #f0f0f0;
 }
+
 .editable:empty:before {
     content: 'Предложите стоимость предмета';
     color: #6c757d;
     font-style: italic;
 }
+
 .save-btn {
     padding: 10px 20px;
     background-color: #28a745;
@@ -132,10 +169,16 @@ th {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    display: block;
 }
+
 .save-btn:hover {
     background-color: #218838;
 }
+
 .floating-save {
     position: fixed;
     bottom: 20px;
@@ -143,22 +186,28 @@ th {
     text-align: center;
     z-index: 1000;
 }
+
 .save-note {
     font-size: 12px;
     color: #6c757d;
     margin-top: 5px;
     max-width: 200px;
 }
+
 #userInfoModal .modal-content {
     background-color: #fff;
     color: #000;
     max-width: 400px;
+    width: 90%;
+    margin: 0 auto;
 }
+
 #userInfoModal input {
     width: 100%;
     padding: 8px;
     margin: 8px 0;
 }
+
 #userInfoModal button[type="submit"] {
     padding: 10px 20px;
     background-color: #28a745;
@@ -166,6 +215,7 @@ th {
     border: none;
     border-radius: 5px;
 }
+
 .success-message {
     display: flex;
     flex-direction: column;
@@ -175,6 +225,7 @@ th {
     font-size: 16px;
     line-height: 1.5;
 }
+
 .whatsapp-link {
     display: inline-flex;
     align-items: center;
@@ -183,10 +234,68 @@ th {
     text-decoration: none;
     font-weight: bold;
 }
+
 .whatsapp-link:hover {
     color: #1ebe52;
 }
+
 .whatsapp-icon {
     width: 24px;
     height: 24px;
+}
+
+/* Медиа-запросы для планшетов и смартфонов */
+@media (max-width: 1024px) {
+    #furnitureTable {
+        font-size: 14px; /* Уменьшаем шрифт для планшетов */
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    #furnitureTable {
+        display: block; /* Преобразуем таблицу в блочный элемент */
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку только для таблицы */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+        font-size: 12px; /* Уменьшаем шрифт для смартфонов */
+    }
+
+    #furnitureTable thead,
+    #furnitureTable tbody,
+    #furnitureTable th,
+    #furnitureTable td,
+    #furnitureTable tr {
+        display: block;
+    }
+
+    #furnitureTable th {
+        display: none; /* Скрываем заголовки на маленьких экранах */
+    }
+
+    #furnitureTable td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #furnitureTable td:before {
+        content: attr(data-label); /* Используем data-label для отображения названий колонок */
+        font-weight: bold;
+        margin-right: 10px;
+        flex: 1;
+    }
+
+    #furnitureTable td img {
+        max-width: 100px; /* Уменьшаем размер изображений */
+        height: auto;
+    }
+
+    .modal-content {
+        max-width: 90%;
+    }
 }
