@@ -12,6 +12,7 @@
         // Обработчик POST-запросов
         window.addEventListener('message', (event) => {
             if (event.origin !== 'https://gvantonov.github.io') return; // Защита от XSS
+            console.log('Received message:', event.data);
 
             const { message, callback } = event.data;
             fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
@@ -22,8 +23,12 @@
                     text: message
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response:', response);
+                return response.json();
+            })
             .then(data => {
+                console.log('Telegram API response:', data);
                 if (callback) {
                     window.parent.postMessage({ success: data.ok }, 'https://gvantonov.github.io');
                 }
