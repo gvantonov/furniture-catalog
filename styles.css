@@ -149,3 +149,20 @@ th {
     margin-top: 5px;
     max-width: 200px;
 }
+#userInfoModal .modal-content {
+    background-color: #fff;
+    color: #000;
+    max-width: 400px;
+}
+#userInfoModal input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+}
+#userInfoModal button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
