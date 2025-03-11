@@ -117,8 +117,20 @@
             font-weight: bold;
             background-color: #f9f9f9;
         }
+        .editable {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            min-height: 24px;
+            padding: 2px 4px;
+        }
         .editable:hover {
             background-color: #f0f0f0;
+        }
+        .editable:empty:before {
+            content: 'Предложите стоимость предмета';
+            color: #6c757d;
+            font-style: italic;
         }
         .save-btn {
             padding: 10px 20px;
@@ -127,10 +139,22 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
         }
         .save-btn:hover {
             background-color: #218838;
+        }
+        .floating-save {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+            z-index: 1000;
+        }
+        .save-note {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+            max-width: 200px;
         }
     </style>
     <!-- Подключение Firebase -->
@@ -144,7 +168,10 @@
         <tbody id="tableBody"></tbody>
         <tfoot id="tableFooter"></tfoot>
     </table>
-    <button class="save-btn" id="saveButton">Сохранить изменения</button>
+    <div class="floating-save">
+        <button class="save-btn" id="saveButton">Сохранить</button>
+        <p class="save-note">Предложите Вашу цену на интересующие вас предметы и нажмите Сохранить</p>
+    </div>
 
     <!-- Модальное окно галереи -->
     <div id="galleryModal" class="modal">
@@ -158,20 +185,34 @@
         </div>
     </div>
 
+    <!-- Модальное окно для ввода имени и телефона -->
+    <div id="userInfoModal" class="modal">
+        <div class="modal-content" style="background-color: #fff; color: #000; max-width: 400px;">
+            <span class="close">×</span>
+            <h2>Введите ваши данные</h2>
+            <form id="userInfoForm">
+                <label for="userName">Имя (обязательно):</label><br>
+                <input type="text" id="userName" name="userName" required style="width: 100%; padding: 8px; margin: 8px 0;"><br>
+                <label for="userPhone">Телефон (необязательно):</label><br>
+                <input type="tel" id="userPhone" name="userPhone" style="width: 100%; padding: 8px; margin: 8px 0;"><br>
+                <button type="submit" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px;">Отправить</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         // Импорт Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getFirestore, doc, setDoc, collection } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
 
         // Конфигурация Firebase (замените на вашу)
         const firebaseConfig = {
-        apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
-	authDomain: "furniture-catalog-35e3e.firebaseapp.com",
-	projectId: "furniture-catalog-35e3e",
-	storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
-	messagingSenderId: "705330640295",
-	appId: "1:705330640295:web:055306fbfc3f95c36cb282",
-	measurementId: "G-98YM4XPHN7"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "furniture-catalog.firebaseapp.com",
+            projectId: "furniture-catalog",
+            storageBucket: "furniture-catalog.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         // Инициализация Firebase
@@ -191,6 +232,9 @@
             const arrowLeft = document.getElementById('arrowLeft');
             const arrowRight = document.getElementById('arrowRight');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const userInfoModal = document.getElementById('userInfoModal');
+            const userInfoForm = document.getElementById('userInfoForm');
+            const userInfoCloseBtn = userInfoModal.querySelector('.close');
             let currentIndex = 0;
             let images = [];
 
@@ -221,7 +265,7 @@
             }
 
             // Динамическое создание заголовков
-            const headers = Object.keys(furnitureData[0]);
+            const headers = Object.keys(furnitureData[0]).filter(header => header !== 'data-prefix');
             const headerRow = document.createElement('tr');
             headers.forEach(header => {
                 const th = document.createElement('th');
@@ -236,13 +280,13 @@
                 const row = document.createElement('tr');
                 headers.forEach(header => {
                     const td = document.createElement('td');
-                    if (header === 'data-prefix') {
+                    if (header === 'Фото') {
                         const img = document.createElement('img');
                         img.className = 'thumbnail';
-                        img.setAttribute('data-prefix', item[header]);
+                        img.setAttribute('data-prefix', item['data-prefix']);
                         img.setAttribute('loading', 'lazy');
                         img.setAttribute('alt', item['Название']);
-                        const imageList = imageData[item[header]] || [];
+                        const imageList = imageData[item['data-prefix']] || [];
                         img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
                         td.appendChild(img);
                     } else if (header === 'Оценка (агент TwoTables), за 1 шт.') {
@@ -261,7 +305,7 @@
                         });
                     } else {
                         td.textContent = item[header] || '';
-                        if (header === '№' || header === 'Количество, шт.') {
+                        if (header === '№№' || header === 'Количество, шт.') {
                             td.style.textAlign = 'right';
                         }
                     }
@@ -285,15 +329,45 @@
             totalRow.appendChild(totalValueCell);
             tfoot.appendChild(totalRow);
 
-            // Сохранение изменений
-            saveButton.addEventListener('click', async () => {
+            // Открытие модального окна для ввода данных пользователя
+            saveButton.addEventListener('click', () => {
+                userInfoModal.style.display = 'flex';
+            });
+
+            // Сохранение данных после ввода имени и телефона
+            userInfoForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const userName = document.getElementById('userName').value.trim();
+                const userPhone = document.getElementById('userPhone').value.trim();
+                if (!userName) {
+                    alert('Пожалуйста, введите ваше имя.');
+                    return;
+                }
                 try {
-                    await setDoc(doc(db, 'furniture', 'catalog'), { data: furnitureData });
-                    alert('Данные сохранены в Firebase!');
+                    const submissionData = {
+                        userName: userName,
+                        userPhone: userPhone,
+                        data: furnitureData,
+                        timestamp: new Date().toISOString()
+                    };
+                    await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
+                    alert('Данные успешно сохранены!');
+                    userInfoModal.style.display = 'none';
+                    userInfoForm.reset();
                 } catch (error) {
                     console.error('Ошибка сохранения:', error);
                     alert('Ошибка при сохранении данных. Данные выведены в консоль.');
-                    console.log(JSON.stringify(furnitureData, null, 2));
+                    console.log(JSON.stringify({ userName, userPhone, data: furnitureData }, null, 2));
+                }
+            });
+
+            userInfoCloseBtn.addEventListener('click', () => {
+                userInfoModal.style.display = 'none';
+            });
+
+            userInfoModal.addEventListener('click', (e) => {
+                if (e.target === userInfoModal) {
+                    userInfoModal.style.display = 'none';
                 }
             });
 
@@ -376,6 +450,5 @@
             });
         });
     </script>
-    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91cad95afc5cbcfe',t:'MTc0MTM1ODQzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
