@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Запрещаем горизонтальную прокрутку на уровне body */
+    overflow-x: auto; /* Разрешаем горизонтальную прокрутку для body */
 }
 
 .container {
@@ -17,7 +17,7 @@ table {
     max-width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    table-layout: auto; /* Позволяет колонкам адаптироваться */
+    table-layout: auto; /* Возвращаем автоматическую компоновку */
 }
 
 th,
@@ -34,13 +34,15 @@ th {
     background-color: #f2f2f2;
 }
 
+/* Миниатюры */
 .thumbnail {
-    max-width: 150px; /* Уменьшаем максимальную ширину миниатюр */
+    max-width: 150px; /* Базовая ширина миниатюр */
     height: auto; /* Сохраняем пропорции */
     cursor: pointer;
     object-fit: cover;
 }
 
+/* Модальные окна и галерея */
 .modal {
     display: none;
     position: fixed;
@@ -244,8 +246,36 @@ th {
     height: 24px;
 }
 
+/* Медиа-запросы для iPad Air 11" (820px–1180px) */
+@media (min-width: 820px) and (max-width: 1180px) {
+    #furnitureTable {
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку для планшетов */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+    }
+
+    .thumbnail {
+        max-width: 100px; /* Уменьшаем размер миниатюр для iPad Air */
+        height: auto;
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 5px;
+        font-size: 12px; /* Уменьшаем шрифт */
+    }
+
+    #furnitureTable td img {
+        max-width: 80px; /* Уменьшаем изображения в ячейках */
+        height: auto;
+    }
+}
+
 /* Медиа-запросы для планшетов (11-13 дюймов, ~834-1194px) */
 @media (min-width: 834px) and (max-width: 1194px) {
+    #furnitureTable {
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку */
+    }
+
     .thumbnail {
         max-width: 120px; /* Уменьшаем размер миниатюр для планшетов */
         height: auto;
@@ -282,9 +312,11 @@ th {
     }
 }
 
-/* Медиа-запросы для смартфонов и альбомной ориентации */
+/* Медиа-запросы для узких экранов (десктоп и планшеты) */
 @media (max-width: 1024px) {
     #furnitureTable {
+        overflow-x: auto; /* Горизонтальная прокрутка для узких экранов */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
         font-size: 14px; /* Уменьшаем шрифт для планшетов */
     }
 
@@ -299,10 +331,11 @@ th {
     }
 }
 
+/* Медиа-запросы для смартфонов */
 @media (max-width: 768px) {
     #furnitureTable {
         display: block; /* Преобразуем таблицу в блочный элемент */
-        overflow-x: auto; /* Добавляем горизонтальную прокрутку только для таблицы */
+        overflow-x: auto; /* Горизонтальная прокрутка для таблицы */
         -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
         font-size: 12px; /* Уменьшаем шрифт для смартфонов */
     }
