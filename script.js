@@ -71,12 +71,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         imageData = {};
     }
 
-    // Динамическое создание заголовков
+// Динамическое создание заголовков
     const headers = Object.keys(furnitureData[0]).filter(header => header !== 'data-prefix');
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
         const th = document.createElement('th');
-        th.textContent = header;
+        // Переименовываем заголовки
+        if (header === 'Пользовательская оценка') {
+            th.textContent = 'Ваша цена';
+        } else if (header === 'Оценка (агент TwoTables), за 1 шт.') {
+            th.textContent = 'Оценка (агент TwoTables)';
+        } else {
+            th.textContent = header;
+        }
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -87,7 +94,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const row = document.createElement('tr');
         headers.forEach(header => {
             const td = document.createElement('td');
-            td.setAttribute('data-label', header); // Добавляем data-label для адаптивности
+            td.setAttribute('data-label', header === 'Пользовательская оценка' ? 'Ваша цена' : 
+                header === 'Оценка (агент TwoTables), за 1 шт.' ? 'Оценка (агент TwoTables)' : header);
             if (header === 'Фото') {
                 const prefix = item['data-prefix'] || `item${item['№№']}`;
                 const img = document.createElement('img');
@@ -122,7 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         tbody.appendChild(row);
     });
-
     // Добавление итоговой строки
     const totalRow = document.createElement('tr');
     const totalLabelCell = document.createElement('td');
