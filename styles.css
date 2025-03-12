@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow-x: auto; /* Разрешаем горизонтальную прокрутку для body */
+    overflow-x: hidden; /* Запрещаем горизонтальную прокрутку на уровне body */
 }
 
 .container {
@@ -17,7 +17,7 @@ table {
     max-width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    table-layout: fixed; /* Фиксируем ширину столбцов для управления размерами */
+    table-layout: auto; /* Позволяет колонкам адаптироваться */
 }
 
 th,
@@ -28,53 +28,6 @@ td {
     box-sizing: border-box;
     word-wrap: break-word; /* Перенос текста в ячейках */
     white-space: normal; /* Разрешаем перенос текста */
-}
-
-/* Ограничиваем ширину столбцов */
-#furnitureTable {
-    min-width: 800px; /* Минимальная ширина таблицы для десктопов */
-}
-
-#furnitureTable th,
-#furnitureTable td {
-    min-width: 60px; /* Минимальная ширина для компактности */
-    max-width: 150px; /* Ограничиваем максимальную ширину */
-}
-
-/* Столбец "Фото" */
-#furnitureTable th:nth-child(1),
-#furnitureTable td:nth-child(1) {
-    width: 20%; /* Процентная ширина для столбца с фото */
-}
-
-/* Столбец "№№" */
-#furnitureTable th:nth-child(2),
-#furnitureTable td:nth-child(2) {
-    width: 10%;
-}
-
-/* Столбец "Название" */
-#furnitureTable th:nth-child(3),
-#furnitureTable td:nth-child(3) {
-    width: 30%;
-}
-
-/* Столбец "Количество, шт." */
-#furnitureTable th:nth-child(4),
-#furnitureTable td:nth-child(4) {
-    width: 15%;
-}
-
-/* Столбец "Оценка (агент TwoTables), за 1 шт." */
-#furnitureTable th:nth-child(5),
-#furnitureTable td:nth-child(5) {
-    width: 15%;
-}
-
-/* Столбец "Пользовательская оценка" */
-#furnitureTable th:nth-child(6),
-#furnitureTable td:nth-child(6) {
-    width: 15%;
 }
 
 th {
@@ -289,33 +242,6 @@ th {
 .whatsapp-icon {
     width: 24px;
     height: 24px;
-}
-
-/* Медиа-запросы для iPad Air 11" (820px–1180px) */
-@media (min-width: 820px) and (max-width: 1180px) {
-    .thumbnail {
-        max-width: 100px; /* Уменьшаем размер миниатюр для iPad Air */
-        height: auto;
-    }
-
-    #furnitureTable th,
-    #furnitureTable td {
-        padding: 5px;
-        font-size: 12px; /* Уменьшаем шрифт */
-        max-width: 120px; /* Ограничиваем ширину столбцов */
-    }
-
-    #furnitureTable td img {
-        max-width: 80px; /* Уменьшаем изображения в ячейках */
-        height: auto;
-    }
-
-    /* Столбец "Пользовательская оценка" */
-    #furnitureTable th:nth-child(6),
-    #furnitureTable td:nth-child(6) {
-        width: 10%; /* Уменьшаем ширину столбца */
-        max-width: 100px; /* Ограничиваем максимальную ширину */
-    }
 }
 
 /* Медиа-запросы для планшетов (11-13 дюймов, ~834-1194px) */
