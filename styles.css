@@ -35,8 +35,8 @@ th {
 }
 
 .thumbnail {
-    width: 200px;
-    height: 200px;
+    max-width: 150px; /* Уменьшаем максимальную ширину миниатюр */
+    height: auto; /* Сохраняем пропорции */
     cursor: pointer;
     object-fit: cover;
 }
@@ -244,7 +244,45 @@ th {
     height: 24px;
 }
 
-/* Медиа-запросы для планшетов и смартфонов */
+/* Медиа-запросы для планшетов (11-13 дюймов, ~834-1194px) */
+@media (min-width: 834px) and (max-width: 1194px) {
+    .thumbnail {
+        max-width: 120px; /* Уменьшаем размер миниатюр для планшетов */
+        height: auto;
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    #furnitureTable td img {
+        max-width: 100px; /* Уменьшаем изображения в ячейках */
+        height: auto;
+    }
+}
+
+/* Медиа-запросы для ноутбуков/ПК (13-16 дюймов, ~1280-1920px) */
+@media (min-width: 1280px) and (max-width: 1920px) {
+    .thumbnail {
+        max-width: 150px; /* Оптимизируем размер для больших экранов */
+        height: auto;
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    #furnitureTable td img {
+        max-width: 120px; /* Уменьшаем изображения в ячейках */
+        height: auto;
+    }
+}
+
+/* Медиа-запросы для смартфонов и альбомной ориентации */
 @media (max-width: 1024px) {
     #furnitureTable {
         font-size: 14px; /* Уменьшаем шрифт для планшетов */
@@ -253,6 +291,11 @@ th {
     #furnitureTable th,
     #furnitureTable td {
         padding: 6px;
+    }
+
+    .thumbnail {
+        max-width: 100px; /* Уменьшаем миниатюры для планшетов */
+        height: auto;
     }
 }
 
@@ -291,7 +334,7 @@ th {
     }
 
     #furnitureTable td img {
-        max-width: 100px; /* Уменьшаем размер изображений */
+        max-width: 80px; /* Уменьшаем изображения для смартфонов */
         height: auto;
     }
 
