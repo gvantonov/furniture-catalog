@@ -17,7 +17,7 @@ table {
     max-width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    table-layout: auto; /* Возвращаем автоматическую компоновку */
+    table-layout: auto; /* Автоматическая компоновка */
 }
 
 th,
@@ -32,6 +32,10 @@ td {
 
 th {
     background-color: #f2f2f2;
+    text-align: center; /* Центрируем текст в заголовках */
+    white-space: normal; /* Разрешаем переносы в заголовках */
+    word-wrap: break-word; /* Разрешаем перенос слов */
+    hyphens: auto; /* Добавляем переносы для длинных слов */
 }
 
 /* Миниатюры */
@@ -159,7 +163,7 @@ th {
 }
 
 .editable:empty:before {
-    content: 'Предложите стоимость предмета';
+    content: 'Предложите Вашу цену'; /* Обновляем замещающий текст */
     color: #6c757d;
     font-style: italic;
 }
