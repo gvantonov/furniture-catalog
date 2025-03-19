@@ -1,0 +1,381 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto; /* Разрешаем горизонтальную прокрутку для body */
+}
+
+.container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    table-layout: auto; /* Автоматическая компоновка */
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    box-sizing: border-box;
+    word-wrap: break-word; /* Перенос текста в ячейках */
+    white-space: normal; /* Разрешаем перенос текста */
+}
+
+th {
+    background-color: #f2f2f2;
+    text-align: center; /* Центрируем текст в заголовках */
+    white-space: normal; /* Разрешаем переносы в заголовках */
+    word-wrap: break-word; /* Разрешаем перенос слов */
+    hyphens: auto; /* Добавляем переносы для длинных слов */
+}
+
+/* Миниатюры */
+.thumbnail {
+    max-width: 150px; /* Базовая ширина миниатюр */
+    height: auto; /* Сохраняем пропорции */
+    cursor: pointer;
+    object-fit: cover;
+}
+
+/* Модальные окна и галерея */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 90%;
+    max-height: 90vh;
+    text-align: center;
+    color: #fff;
+    overflow-y: auto; /* Прокрутка внутри модального окна при необходимости */
+}
+
+.main-image {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+}
+
+.thumbnail-gallery {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    overflow-x: auto;
+}
+
+.thumbnail-gallery img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.thumbnail-gallery img.active {
+    border: 2px solid #007bff;
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+    color: black;
+    text-shadow: 0 0 5px white;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1001;
+}
+
+.arrow-left {
+    left: -50px;
+}
+
+.arrow-right {
+    right: -50px;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.fullscreen-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.fullscreen-btn:hover {
+    background-color: #0056b3;
+}
+
+.total-cost {
+    font-weight: bold;
+    background-color: #f9f9f9;
+}
+
+.editable {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    min-height: 24px;
+    padding: 2px 4px;
+}
+
+.editable:hover {
+    background-color: #f0f0f0;
+}
+
+.editable:empty:before {
+    content: 'Предложите Вашу цену'; /* Обновляем замещающий текст */
+    color: #6c757d;
+    font-style: italic;
+}
+
+.save-btn {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+    display: block;
+}
+
+.save-btn:hover {
+    background-color: #218838;
+}
+
+.floating-save {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.save-note {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+    max-width: 200px;
+}
+
+#userInfoModal .modal-content {
+    background-color: #fff;
+    color: #000;
+    max-width: 400px;
+    width: 90%;
+    margin: 0 auto;
+}
+
+#userInfoModal input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+}
+
+#userInfoModal button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.success-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.whatsapp-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #25D366;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.whatsapp-link:hover {
+    color: #1ebe52;
+}
+
+.whatsapp-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Медиа-запросы для iPad Air 11" (820px–1180px) */
+@media (min-width: 820px) and (max-width: 1180px) {
+    #furnitureTable {
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку для планшетов */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+    }
+
+    .thumbnail {
+        max-width: 100px; /* Уменьшаем размер миниатюр для iPad Air */
+        height: auto;
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 5px;
+        font-size: 12px; /* Уменьшаем шрифт */
+    }
+
+    #furnitureTable td img {
+        max-width: 80px; /* Уменьшаем изображения в ячейках */
+        height: auto;
+    }
+}
+
+/* Медиа-запросы для планшетов (11-13 дюймов, ~834-1194px) */
+@media (min-width: 834px) and (max-width: 1194px) {
+    #furnitureTable {
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку */
+    }
+
+    .thumbnail {
+        max-width: 120px; /* Уменьшаем размер миниатюр для планшетов */
+        height: auto;
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    #furnitureTable td img {
+        max-width: 100px; /* Уменьшаем изображения в ячейках */
+        height: auto;
+    }
+}
+
+/* Медиа-запросы для ноутбуков/ПК (13-16 дюймов, ~1280-1920px) */
+@media (min-width: 1280px) and (max-width: 1920px) {
+    .thumbnail {
+        max-width: 150px; /* Оптимизируем размер для больших экранов */
+        height: auto;
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    #furnitureTable td img {
+        max-width: 120px; /* Уменьшаем изображения в ячейках */
+        height: auto;
+    }
+}
+
+/* Медиа-запросы для узких экранов (десктоп и планшеты) */
+@media (max-width: 1024px) {
+    #furnitureTable {
+        overflow-x: auto; /* Горизонтальная прокрутка для узких экранов */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+        font-size: 14px; /* Уменьшаем шрифт для планшетов */
+    }
+
+    #furnitureTable th,
+    #furnitureTable td {
+        padding: 6px;
+    }
+
+    .thumbnail {
+        max-width: 100px; /* Уменьшаем миниатюры для планшетов */
+        height: auto;
+    }
+}
+
+/* Медиа-запросы для смартфонов */
+@media (max-width: 768px) {
+    #furnitureTable {
+        display: block; /* Преобразуем таблицу в блочный элемент */
+        overflow-x: auto; /* Горизонтальная прокрутка для таблицы */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+        font-size: 12px; /* Уменьшаем шрифт для смартфонов */
+    }
+
+    #furnitureTable thead,
+    #furnitureTable tbody,
+    #furnitureTable th,
+    #furnitureTable td,
+    #furnitureTable tr {
+        display: block;
+    }
+
+    #furnitureTable th {
+        display: none; /* Скрываем заголовки на маленьких экранах */
+    }
+
+    #furnitureTable td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #furnitureTable td:before {
+        content: attr(data-label); /* Используем data-label для отображения названий колонок */
+        font-weight: bold;
+        margin-right: 10px;
+        flex: 1;
+    }
+
+    #furnitureTable td img {
+        max-width: 80px; /* Уменьшаем изображения для смартфонов */
+        height: auto;
+    }
+
+    .modal-content {
+        max-width: 90%;
+    }
+}
