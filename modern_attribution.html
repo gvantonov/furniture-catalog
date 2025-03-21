@@ -8,7 +8,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Современная мебель (требует атрибуции)</h1>
+    <div class="fixed-header">
+        <h1>Современная мебель. Требует атрибуции)</h1>
+        <nav>
+            <ul class="tabs">
+                <li><a href="index.html" class="tab">Все предметы</a></li>
+                <li><a href="vintage_antique.html?category=vintage_antique" class="tab">Винтажные/антикварные</a></li>
+                <li><a href="vintage_possible.html?category=vintage_possible" class="tab">Вероятно, винтажная</a></li>
+                <li><a href="modern_expensive.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
+                <li><a href="modern_attribution.html?category=modern_attribution" class="tab active">Современная (атрибуция)</a></li>
+                <li><a href="sofas.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="content">
     <table id="furnitureTable">
         <thead id="tableHeader"></thead>
         <tbody id="tableBody"></tbody>
@@ -45,7 +58,7 @@
             </form>
         </div>
     </div>
-
+ </div>
     <script type="module" src="script.js"></script>
 </body>
 </html>

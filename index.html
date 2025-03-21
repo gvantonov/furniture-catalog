@@ -8,51 +8,55 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Каталог мебели</h1>
-    <nav>
-        <ul>
-            <li><a href="index.html">Все предметы</a></li>
-            <li><a href="vintage_antique.html?category=vintage_antique">Винтажные/антикварные предметы</a></li>
-            <li><a href="vintage_possible.html?category=vintage_possible">Вероятно, винтажная мебель</a></li>
-            <li><a href="modern_expensive.html?category=modern_expensive">Современная мебель (более 150 тыс. ₽)</a></li>
-            <li><a href="modern_attribution.html?category=modern_attribution">Современная мебель (требует атрибуции)</a></li>
-            <li><a href="sofas.html?category=sofas">Диваны (40–150 тыс. ₽)</a></li>
-        </ul>
-    </nav>
-    <table id="furnitureTable">
-        <thead id="tableHeader"></thead>
-        <tbody id="tableBody"></tbody>
-        <tfoot id="tableFooter"></tfoot>
-    </table>
-    <div class="floating-save">
-        <button class="save-btn" id="saveButton">Сохранить</button>
-        <p class="save-note">Предложите Вашу цену на интересующие вас предметы и нажмите Сохранить</p>
+    <div class="fixed-header">
+        <h1>Каталог мебели</h1>
+        <nav>
+            <ul class="tabs">
+                <li><a href="index.html" class="tab active">Все предметы</a></li>
+                <li><a href="vintage_antique.html?category=vintage_antique" class="tab">Винтажные/антикварные</a></li>
+                <li><a href="vintage_possible.html?category=vintage_possible" class="tab">Вероятно, винтажная</a></li>
+                <li><a href="modern_expensive.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
+                <li><a href="modern_attribution.html?category=modern_attribution" class="tab">Современная (атрибуция)</a></li>
+                <li><a href="sofas.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
+            </ul>
+        </nav>
     </div>
-
-    <!-- Модальное окно галереи -->
-    <div id="galleryModal" class="modal">
-        <span class="close">×</span>
-        <div class="modal-content">
-            <img id="mainImage" class="main-image" src="" alt="Main Image">
-            <div class="thumbnail-gallery" id="thumbnailGallery"></div>
-            <span class="arrow arrow-left" id="arrowLeft">◀</span>
-            <span class="arrow arrow-right" id="arrowRight">▶</span>
-            <button class="fullscreen-btn" id="fullscreenBtn">Полноэкранный режим</button>
+    <div class="content">
+        <table id="furnitureTable">
+            <thead id="tableHeader"></thead>
+            <tbody id="tableBody"></tbody>
+            <tfoot id="tableFooter"></tfoot>
+        </table>
+        <div class="floating-save">
+            <button class="save-btn" id="saveButton">Сохранить</button>
+            <p class="save-note">Предложите Вашу цену на интересующие вас предметы и нажмите Сохранить</p>
         </div>
-    </div>
 
-    <!-- Модальное окно для ввода имени и телефона -->
-    <div id="userInfoModal" class="modal">
-        <div class="modal-content">
+        <!-- Модальное окно галереи -->
+        <div id="galleryModal" class="modal">
             <span class="close">×</span>
-            <h2>Введите ваши данные</h2>
-            <form id="userInfoForm">
-                <label for="userName">Имя:</label><br>
-                <input type="text" id="userName" name="userName" autocomplete="name" required placeholder="Имя (обязательно)"><br>
-                <label for="userPhone">Телефон:</label><br>
-                <input type="tel" id="userPhone" name="userPhone" autocomplete="tel" placeholder="Телефон (необязательно)"><br>
-                <button type="submit">Отправить</button>
-            </form>
+            <div class="modal-content">
+                <img id="mainImage" class="main-image" src="" alt="Main Image">
+                <div class="thumbnail-gallery" id="thumbnailGallery"></div>
+                <span class="arrow arrow-left" id="arrowLeft">◀</span>
+                <span class="arrow arrow-right" id="arrowRight">▶</span>
+                <button class="fullscreen-btn" id="fullscreenBtn">Полноэкранный режим</button>
+            </div>
+        </div>
+
+        <!-- Модальное окно для ввода имени и телефона -->
+        <div id="userInfoModal" class="modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>Введите ваши данные</h2>
+                <form id="userInfoForm">
+                    <label for="userName">Имя:</label><br>
+                    <input type="text" id="userName" name="userName" autocomplete="name" required placeholder="Имя (обязательно)"><br>
+                    <label for="userPhone">Телефон:</label><br>
+                    <input type="tel" id="userPhone" name="userPhone" autocomplete="tel" placeholder="Телефон (необязательно)"><br>
+                    <button type="submit">Отправить</button>
+                </form>
+            </div>
         </div>
     </div>
 
