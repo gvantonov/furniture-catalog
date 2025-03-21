@@ -24,6 +24,19 @@ try {
     alert("Ошибка подключения к Firebase. Проверьте конфигурацию в script.js.");
 }
 
+// Определение категорий и соответствующих номеров предметов
+const categories = {
+    'vintage_antique': ['8', '11', '12', '13', '14', '32', '33', '34', '38', '88', '89', '90', '95', '100', '103', '17', '81'],
+    'vintage_possible': ['5', '10', '12', '13', '15', '16', '19', '20', '21', '22', '23', '34', '39', '43', '44', '46', '47', '48', '50', '51', '52', '53', '84', '85', '102', '104'],
+    'modern_expensive': ['105', '101', '98', '97', '96'],
+    'modern_attribution': ['80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2'],
+    'sofas': ['70', '71', '72', '73', '74', '75', '76', '77', '78', '79']
+};
+
+// Получение категории из URL
+const urlParams = new URLSearchParams(window.location.search);
+const category = urlParams.get('category') || 'all'; // Если категории нет, показываем все предметы
+
 document.addEventListener('DOMContentLoaded', async () => {
     const table = document.getElementById('furnitureTable');
     const thead = document.getElementById('tableHeader');
@@ -56,6 +69,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // Фильтрация данных по категории
+    if (category !== 'all') {
+        const allowedItems = categories[category] || [];
+        furnitureData = furnitureData.filter(item => allowedItems.includes(item['№№']));
+    }
+
     // Загрузка images.json (для галереи)
     let imageData = {};
     try {
@@ -71,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         imageData = {};
     }
 
-// Динамическое создание заголовков
+    // Динамическое создание заголовков
     const headers = Object.keys(furnitureData[0]).filter(header => header !== 'data-prefix');
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
@@ -130,6 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         tbody.appendChild(row);
     });
+
     // Добавление итоговой строки
     const totalRow = document.createElement('tr');
     const totalLabelCell = document.createElement('td');
