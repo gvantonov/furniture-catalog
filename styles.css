@@ -168,36 +168,39 @@ th {
     font-style: italic;
 }
 
+
+/* Плавающая кнопка "Сохранить" */
+.floating-save {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
 .save-btn {
-    padding: 10px 20px;
     background-color: #28a745;
     color: white;
     border: none;
+    padding: 10px 20px; /* Уменьшаем размер кнопки */
     border-radius: 5px;
     cursor: pointer;
-    width: 100%;
-    max-width: 300px;
-    margin: 10px auto;
-    display: block;
+    font-size: 16px; /* Уменьшаем шрифт */
+    transition: background-color 0.3s;
 }
 
 .save-btn:hover {
     background-color: #218838;
 }
 
-.floating-save {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    text-align: center;
-    z-index: 1000;
-}
-
 .save-note {
-    font-size: 12px;
-    color: #6c757d;
     margin-top: 5px;
-    max-width: 200px;
+    font-size: 12px; /* Уменьшаем шрифт текста */
+    color: #666;
+    text-align: right;
+    max-width: 200px; /* Ограничиваем ширину текста */
 }
 
 #userInfoModal .modal-content {
@@ -440,20 +443,27 @@ nav {
 /* Контент под фиксированным заголовком */
 .content {
     padding: 20px;
+    padding-bottom: 100px; /* Добавляем отступ снизу, чтобы итоговая сумма не перекрывалась */
 }
 
 /* Адаптация для мобильных устройств */
 @media (max-width: 768px) {
-    .fixed-header h1 {
-        font-size: 20px;
+    .content {
+        padding-bottom: 120px; /* Увеличиваем отступ на мобильных устройствах */
     }
 
-    .tabs {
-        gap: 5px;
+    .floating-save {
+        bottom: 10px;
+        right: 10px;
     }
 
-    .tab {
+    .save-btn {
         padding: 8px 15px;
         font-size: 14px;
+    }
+
+    .save-note {
+        font-size: 10px;
+        max-width: 150px;
     }
 }
