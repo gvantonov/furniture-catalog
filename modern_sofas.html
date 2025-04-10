@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; object-src 'none'; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://api.telegram.org; img-src 'self' https://*.github.io data:;">
-    <title>Каталог мебели</title>
+    <title>Современная мебель и диваны</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="fixed-header">
-        <h1>Каталог мебели</h1>
-       <nav>
-    <ul class="tabs">
-        <li><a href="index.html" class="tab active">Все предметы</a></li>
-        <li><a href="vintage_antique.html?category=vintage_antique" class="tab">Винтажные/антикварные</a></li>
-        <li><a href="vintage_possible.html?category=vintage_possible" class="tab">Вероятно, винтажная</a></li>
-        <li><a href="modern_expensive.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
-        <li><a href="modern_attribution.html?category=modern_attribution" class="tab">Современная (атрибуция)</a></li>
-        <li><a href="sofas.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
-        <li><a href="modern_sofas.html?category=modern_sofas" class="tab">Современная и диваны</a></li>
-        <li><a href="visitor_stats.php" class="tab">Статистика посетителей</a></li>
-    </ul>
-</nav>
+        <h1>Современная мебель и диваны</h1>
+        <nav>
+            <ul class="tabs">
+                <li><a href="index.html" class="tab">Все предметы</a></li>
+                <li><a href="vintage_antique.html?category=vintage_antique" class="tab">Винтажные/антикварные</a></li>
+                <li><a href="vintage_possible.html?category=vintage_possible" class="tab">Вероятно, винтажная</a></li>
+                <li><a href="modern_expensive.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
+                <li><a href="modern_attribution.html?category=modern_attribution" class="tab">Современная (атрибуция)</a></li>
+                <li><a href="sofas.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
+                <li><a href="modern_sofas.html?category=modern_sofas" class="tab active">Современная и диваны</a></li>
+                <li><a href="visitor_stats.php" class="tab">Статистика посетителей</a></li>
+            </ul>
+        </nav>
     </div>
     <div class="content">
         <table id="furnitureTable">
@@ -31,7 +31,7 @@
         </table>
         <div class="floating-save">
             <button class="save-btn" id="saveButton">Сохранить</button>
-            <p class="save-note">Предложите Вашу цену на интересующие вас предметы и нажмите Сохранить</p>
+            <p class="save-note">Выберите предметы для продажи или отметьте ценные предметы и нажмите Сохранить</p>
         </div>
 
         <!-- Модальное окно галереи -->
@@ -43,6 +43,16 @@
                 <span class="arrow arrow-left" id="arrowLeft">◀</span>
                 <span class="arrow arrow-right" id="arrowRight">▶</span>
                 <button class="fullscreen-btn" id="fullscreenBtn">Полноэкранный режим</button>
+            </div>
+        </div>
+
+        <!-- Модальное окно для подтверждения сохранения -->
+        <div id="confirmModal" class="modal">
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h2>Вы хотите сохранить введенные данные?</h2>
+                <button id="confirmYes">Да</button>
+                <button id="confirmNo">Нет</button>
             </div>
         </div>
 
@@ -63,5 +73,19 @@
     </div>
 
     <script type="module" src="script.js"></script>
+    <!-- Скрипт для отслеживания посетителей -->
+    <script>
+        fetch('track_visitor.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tracked: true })
+        }).then(response => {
+            console.log('Посетитель отслежен:', response);
+        }).catch(error => {
+            console.error('Ошибка при отслеживании посетителя:', error);
+        });
+    </script>
 </body>
 </html>

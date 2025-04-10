@@ -467,3 +467,46 @@ nav {
         max-width: 150px;
     }
 }
+
+/* Стили для чекбоксов */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Стили для модального окна подтверждения */
+#confirmModal .modal-content {
+    text-align: center;
+}
+
+#confirmModal h2 {
+    margin-bottom: 20px;
+}
+
+#confirmYes, #confirmNo {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#confirmYes {
+    background-color: #28a745;
+    color: white;
+}
+
+#confirmYes:hover {
+    background-color: #218838;
+}
+
+#confirmNo {
+    background-color: #dc3545;
+    color: white;
+}
+
+#confirmNo:hover {
+    background-color: #c82333;
+}

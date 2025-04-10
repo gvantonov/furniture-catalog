@@ -26,16 +26,20 @@ try {
 
 // Определение категорий и соответствующих номеров предметов
 const categories = {
-    'vintage_antique': ['8', '11', '12', '13', '14','18', '32', '33', '34', '38', '88', '89', '90', '95', '100', '103', '17', '81'],
+    'vintage_antique': ['8', '11', '12', '13', '14', '32', '33', '34', '38', '88', '89', '90', '95', '100', '103', '17', '81'],
     'vintage_possible': ['5', '10', '12', '13', '15', '16', '19', '20', '21', '22', '23', '34', '39', '43', '44', '46', '47', '48', '50', '51', '52', '53', '84', '85', '102', '104'],
     'modern_expensive': ['105', '101', '98', '97', '96'],
     'modern_attribution': ['80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2'],
-    'sofas': ['70', '71', '72', '73', '74', '75', '76', '77', '78', '79']
+    'sofas': ['70', '71', '72', '73', '74', '75', '76', '77', '78', '79'],
+    'modern_sofas': ['80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79'] // Объединяем "Современная (атрибуция)" и "Диваны"
 };
 
 // Получение категории из URL
 const urlParams = new URLSearchParams(window.location.search);
-const category = urlParams.get('category') || 'all'; // Если категории нет, показываем все предметы
+const category = urlParams.get('category') || 'all';
+
+// Проверка, является ли текущая страница modern_sofas
+const isModernSofasPage = category === 'modern_sofas';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const table = document.getElementById('furnitureTable');
@@ -50,14 +54,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const arrowLeft = document.getElementById('arrowLeft');
     const arrowRight = document.getElementById('arrowRight');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmYes = document.getElementById('confirmYes');
+    const confirmNo = document.getElementById('confirmNo');
     const userInfoModal = document.getElementById('userInfoModal');
     const userInfoForm = document.getElementById('userInfoForm');
     const userInfoCloseBtn = userInfoModal.querySelector('.close');
     let currentIndex = 0;
     let images = [];
+    let furnitureData = [];
 
     // Загрузка furniture_catalog.json
-    let furnitureData = [];
     try {
         const response = await fetch('furniture_catalog.json');
         if (!response.ok) {
@@ -91,14 +98,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Динамическое создание заголовков
-    const headers = Object.keys(furnitureData[0]).filter(header => header !== 'data-prefix');
+    let headers = Object.keys(furnitureData[0]).filter(header => header !== 'data-prefix' && header !== 'Пользовательская оценка');
+    if (isModernSofasPage) {
+        headers = [...headers, 'На продажу', 'Ценный предмет'];
+    } else {
+        headers = [...headers, 'Пользовательская оценка'];
+    }
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
         const th = document.createElement('th');
-        // Переименовываем заголовки
-        if (header === 'Пользовательская оценка') {
-            th.textContent = 'Ваша цена';
-        } else if (header === 'Оценка (агент TwoTables), за 1 шт.') {
+        if (header === 'Оценка (агент TwoTables), за 1 шт.') {
             th.textContent = 'Оценка (агент TwoTables)';
         } else {
             th.textContent = header;
@@ -113,8 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const row = document.createElement('tr');
         headers.forEach(header => {
             const td = document.createElement('td');
-            td.setAttribute('data-label', header === 'Пользовательская оценка' ? 'Ваша цена' : 
-                header === 'Оценка (агент TwoTables), за 1 шт.' ? 'Оценка (агент TwoTables)' : header);
+            td.setAttribute('data-label', header === 'Оценка (агент TwoTables), за 1 шт.' ? 'Оценка (агент TwoTables)' : header);
             if (header === 'Фото') {
                 const prefix = item['data-prefix'] || `item${item['№№']}`;
                 const img = document.createElement('img');
@@ -131,7 +139,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 td.style.textAlign = 'right';
                 const quantity = parseInt(item['Количество, шт.']) || 1;
                 totalCost += cost * quantity;
-            } else if (header === 'Пользовательская оценка') {
+            } else if (header === 'На продажу' && isModernSofasPage) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'for-sale';
+                checkbox.checked = item['На продажу'] || false;
+                checkbox.addEventListener('change', () => {
+                    furnitureData[rowIndex]['На продажу'] = checkbox.checked;
+                });
+                td.appendChild(checkbox);
+                td.style.textAlign = 'center';
+            } else if (header === 'Ценный предмет' && isModernSofasPage) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'valuable';
+                checkbox.checked = item['Ценный предмет'] || false;
+                checkbox.addEventListener('change', () => {
+                    furnitureData[rowIndex]['Ценный предмет'] = checkbox.checked;
+                });
+                td.appendChild(checkbox);
+                td.style.textAlign = 'center';
+            } else if (header === 'Пользовательская оценка' && !isModernSofasPage) {
                 td.className = 'editable';
                 td.setAttribute('contenteditable', 'true');
                 td.textContent = item[header] || '';
@@ -165,9 +193,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     totalRow.appendChild(totalValueCell);
     tfoot.appendChild(totalRow);
 
-    // Открытие модального окна для ввода данных пользователя
+    // Открытие модального окна для подтверждения
     saveButton.addEventListener('click', () => {
+        confirmModal.style.display = 'flex';
+    });
+
+    // Обработка кнопки "Да" в модальном окне подтверждения
+    confirmYes.addEventListener('click', () => {
+        confirmModal.style.display = 'none';
         userInfoModal.style.display = 'flex';
+    });
+
+    // Обработка кнопки "Нет" в модальном окне подтверждения
+    confirmNo.addEventListener('click', () => {
+        confirmModal.style.display = 'none';
+    });
+
+    // Закрытие модального окна подтверждения при клике на крестик
+    confirmModal.querySelector('.close').addEventListener('click', () => {
+        confirmModal.style.display = 'none';
+    });
+
+    // Закрытие модального окна подтверждения при клике вне окна
+    confirmModal.addEventListener('click', (e) => {
+        if (e.target === confirmModal) {
+            confirmModal.style.display = 'none';
+        }
     });
 
     // Сохранение данных после ввода имени и телефона
@@ -181,54 +232,56 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (!db) {
-            alert('Firebase не инициализирован. Проверьте конфигурацию.');
-            console.error('Firestore не доступен.');
-            return;
-        }
-
         try {
-            console.log('Отправка данных:', { userName, userPhone, data: furnitureData });
-            const submissionData = {
-                userName: userName,
-                userPhone: userPhone,
-                data: furnitureData,
-                timestamp: new Date().toISOString()
-            };
-            await setDoc(doc(db, 'furniture', `submission_${Date.now()}`), submissionData);
-
             // Формирование сообщения для Telegram
             const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
-            const itemsWithCustomPrice = furnitureData.filter(item => item['Пользовательская оценка'] && item['Пользовательская оценка'].trim() !== '');
-            let telegramMessage = `🔔 Новые ценовые предложения от ${userName} (${userPhone})\n`;
+            const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
+            let telegramMessage = `🔔 Новые данные по современной мебели и диванам от ${userName} (${userPhone})\n`;
             telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
-            if (itemsWithCustomPrice.length > 0) {
-                itemsWithCustomPrice.forEach(item => {
+            if (itemsWithSelection.length > 0) {
+                itemsWithSelection.forEach(item => {
                     telegramMessage += `- №: ${item['№№']}\n`;
                     telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
-                    telegramMessage += `  Предложенная стоимость: ${item['Пользовательская оценка'] || 'Не указано'} ₽\n\n`;
+                    telegramMessage += `  На продажу: ${item['На продажу'] ? 'Да' : 'Нет'}\n`;
+                    telegramMessage += `  Ценный предмет: ${item['Ценный предмет'] ? 'Да' : 'Нет'}\n\n`;
                 });
             } else {
-                telegramMessage += 'Нет предложений по стоимости.\n';
+                telegramMessage += 'Нет выбранных предметов.\n';
             }
-            console.log('Telegram message:', telegramMessage); // Отладка
 
-            // Отправка через iframe к прокси
+            // Отправка в Telegram через iframe
             const iframe = document.createElement('iframe');
             iframe.src = 'telegram-proxy.html';
             iframe.style.display = 'none';
             document.body.appendChild(iframe);
             iframe.onload = () => {
-                console.log('Iframe loaded, sending message:', telegramMessage);
                 iframe.contentWindow.postMessage({ message: telegramMessage }, 'https://gvantonov.github.io');
             };
+
+            // Сохранение данных в базу данных через PHP
+            const response = await fetch('save_modern_sofas.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userName,
+                    userPhone,
+                    data: furnitureData,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при сохранении данных в базу данных');
+            }
 
             // Заменяем содержимое модального окна на сообщение об успешной отправке
             const modalContent = userInfoModal.querySelector('.modal-content');
             modalContent.innerHTML = `
                 <span class="close">×</span>
                 <div class="success-message">
-                    <p>Ваше предложение по стоимости направлено продавцу.</p>
+                    <p>Ваши данные успешно сохранены и отправлены.</p>
                     <p>Если у вас есть дополнительные вопросы — напишите в WhatsApp</p>
                     <a href="http://wa.me/79153555202" target="_blank" class="whatsapp-link">
                         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3Cpath fill='%2325D366' d='M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.218 1.617 6.042L0 24l6.058-1.587A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.874 0-3.627-.497-5.144-1.357l-.357-.212-3.6.943.961-3.518-.226-.37A9.956 9.956 0 0 1 2 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.618-4.943c-.308-.154-1.827-.904-2.11-.998-.282-.094-.488-.146-.694.146-.206.292-.798.998-.975 1.202-.177.204-.354.22-.652.073-.297-.147-1.254-.46-2.39-1.467-.883-.784-1.48-1.753-1.657-2.045-.177-.292-.018-.45.132-.596.135-.132.304-.346.456-.526.153-.18.206-.308.31-.518.103-.21.051-.394-.026-.553-.077-.16-.694-1.672-.952-2.29-.252-.598-.508-.517-.694-.517-.187 0-.399-.02-.611-.02-.212 0-.558.073-.852.368-.294.295-1.126 1.1-1.126 2.682 0 1.582 1.152 3.11 1.314 3.324.161.214 2.267 3.465 5.494 4.858.766.332 1.366.531 1.834.681.772.247 1.475.212 2.03.129.619-.094 1.827-.747 2.084-1.467.257-.72.257-1.34.18-1.467-.077-.127-.283-.201-.591-.355z'/%3E%3C/svg%3E" alt="WhatsApp" class="whatsapp-icon">
