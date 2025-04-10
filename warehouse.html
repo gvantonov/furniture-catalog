@@ -31,31 +31,18 @@
 
         <!-- Модальное окно галереи -->
         <div id="galleryModal" class="modal">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <div class="modal-content">
                 <img id="mainImage" class="main-image" src="" alt="Main Image">
                 <div class="thumbnail-gallery" id="thumbnailGallery"></div>
-                <span class="arrow arrow-left" id="arrowLeft">&lt;</span>
-                <span class="arrow arrow-right" id="arrowRight">&gt;</span>
+                <span class="arrow arrow-left" id="arrowLeft"><</span>
+                <span class="arrow arrow-right" id="arrowRight">></span>
                 <button class="fullscreen-btn" id="fullscreenBtn">Полноэкранный режим</button>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
-    <!-- Скрипт для отслеживания посетителей -->
-    <script>
-        fetch('track_visitor.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ tracked: true })
-        }).then(response => {
-            console.log('Посетитель отслежен:', response);
-        }).catch(error => {
-            console.error('Ошибка при отслеживании посетителя:', error);
-        });
-    </script>
+    <script src="track_visitor.js"></script>
 </body>
 </html>

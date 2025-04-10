@@ -73,18 +73,6 @@
 
     <script type="module" src="script.js"></script>
     <!-- Скрипт для отслеживания посетителей -->
-    <script>
-        fetch('track_visitor.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ tracked: true })
-        }).then(response => {
-            console.log('Посетитель отслежен:', response);
-        }).catch(error => {
-            console.error('Ошибка при отслеживании посетителя:', error);
-        });
-    </script>
+    <script src="track_visitor.js"></script>
 </body>
 </html>
