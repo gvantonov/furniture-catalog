@@ -1,6 +1,6 @@
 // Импорт Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 // Конфигурация Firebase
 const firebaseConfig = {
@@ -258,23 +258,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 iframe.contentWindow.postMessage({ message: telegramMessage }, 'https://gvantonov.github.io');
             };
 
-            // Сохранение данных в базу данных через PHP
-            const response = await fetch('save_modern_sofas.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userName,
-                    userPhone,
-                    data: furnitureData,
-                    timestamp: new Date().toISOString()
-                })
+            // Сохранение данных в Firestore
+            await addDoc(collection(db, 'modern_sofas_submissions'), {
+                userName: userName,
+                userPhone: userPhone,
+                data: furnitureData,
+                timestamp: new Date().toISOString()
             });
-
-            if (!response.ok) {
-                throw new Error('Ошибка при сохранении данных в базу данных');
-            }
 
             // Заменяем содержимое модального окна на сообщение об успешной отправке
             const modalContent = userInfoModal.querySelector('.modal-content');
