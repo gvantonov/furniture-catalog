@@ -31,7 +31,7 @@ const categories = {
     'modern_expensive': ['105', '101', '98', '97', '96'],
     'modern_attribution': ['80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2'],
     'sofas': ['70', '71', '72', '73', '74', '75', '76', '77', '78', '79'],
-    'modern_sofas': ['80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79'] // Объединяем "Современная (атрибуция)" и "Диваны"
+    'modern_sofas': ['80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79']
 };
 
 // Получение категории из URL
@@ -41,209 +41,264 @@ const category = urlParams.get('category') || 'all';
 // Проверка, является ли текущая страница modern_sofas
 const isModernSofasPage = category === 'modern_sofas';
 
-document.addEventListener('DOMContentLoaded', function () {
-    var table = document.getElementById('furnitureTable');
-    var thead = document.getElementById('tableHeader');
-    var tbody = document.getElementById('tableBody');
-    var modal = document.getElementById('galleryModal');
-    var mainImage = document.getElementById('mainImage');
-    var thumbnailGallery = document.getElementById('thumbnailGallery');
-    var closeBtn = document.querySelector('.close');
-    var arrowLeft = document.getElementById('arrowLeft');
-    var arrowRight = document.getElementById('arrowRight');
-    var fullscreenBtn = document.getElementById('fullscreenBtn');
-    var currentIndex = 0;
-    var images = [];
+// Проверка, является ли текущая страница warehouse.html
+const currentPage = window.location.pathname.split('/').pop();
+const isWarehousePage = currentPage === 'warehouse.html';
 
-    // Определяем, на какой странице мы находимся
-    var currentPage = window.location.pathname.split('/').pop();
-    var isWarehousePage = currentPage === 'warehouse.html';
+document.addEventListener('DOMContentLoaded', async () => {
+    const table = document.getElementById('furnitureTable');
+    const thead = document.getElementById('tableHeader');
+    const tbody = document.getElementById('tableBody');
+    const tfoot = document.getElementById('tableFooter');
+    const saveButton = document.getElementById('saveButton');
+    const modal = document.getElementById('galleryModal');
+    const mainImage = document.getElementById('mainImage');
+    const thumbnailGallery = document.getElementById('thumbnailGallery');
+    const closeBtn = document.querySelector('.close');
+    const arrowLeft = document.getElementById('arrowLeft');
+    const arrowRight = document.getElementById('arrowRight');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmYes = document.getElementById('confirmYes');
+    const confirmNo = document.getElementById('confirmNo');
+    const userInfoModal = document.getElementById('userInfoModal');
+    const userInfoForm = document.getElementById('userInfoForm');
+    const userInfoCloseBtn = userInfoModal ? userInfoModal.querySelector('.close') : null;
+    let currentIndex = 0;
+    let images = [];
+    let furnitureData = [];
+
+    // Загрузка данных в зависимости от страницы
+    let dataUrl = isWarehousePage ? 'warehouse_data.json' : 'furniture_catalog.json';
+    let imagesUrl = isWarehousePage ? 'warehouse_images.json' : 'images.json';
 
     // Загрузка данных
-    var furnitureData = [];
-    var imageData = {};
-
-    // Функция для загрузки JSON
-    function fetchJson(url, errorMessage) {
-        return fetch(url)
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error(errorMessage + ' status: ' + response.status);
-                }
-                return response.json();
-            });
+    try {
+        const response = await fetch(dataUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        furnitureData = await response.json();
+    } catch (error) {
+        console.error(`Ошибка загрузки ${dataUrl}:`, error);
+        return;
     }
 
-    // Загружаем данные в зависимости от страницы
-    if (isWarehousePage) {
-        // Для warehouse.html загружаем warehouse_data.json и warehouse_images.json
-        fetchJson('warehouse_data.json', 'Ошибка загрузки warehouse_data.json:')
-            .then(function (data) {
-                furnitureData = data;
-                return fetchJson('warehouse_images.json', 'Ошибка загрузки warehouse_images.json:');
-            })
-            .then(function (data) {
-                imageData = data;
-                renderTable();
-            })
-            .catch(function (error) {
-                console.error(error);
-                renderTable(); // Рендерим таблицу даже при ошибке загрузки изображений
-            });
-    } else {
-        // Для остальных страниц загружаем furniture_catalog.json и images.json
-        fetchJson('furniture_catalog.json', 'Ошибка загрузки furniture_catalog.json:')
-            .then(function (data) {
-                furnitureData = data;
-                return fetchJson('images.json', 'Ошибка загрузки images.json:');
-            })
-            .then(function (data) {
-                imageData = data;
-                // Фильтрация данных по категории (для страниц с параметром category)
-                var urlParams = new URLSearchParams(window.location.search);
-                var category = urlParams.get('category');
-                if (category) {
-                    furnitureData = furnitureData.filter(function (item) {
-                        return item['Категория'] === category;
-                    });
-                }
-                renderTable();
-            })
-            .catch(function (error) {
-                console.error(error);
-                renderTable(); // Рендерим таблицу даже при ошибке загрузки изображений
-            });
+    // Фильтрация данных по категории (только для страниц, кроме warehouse.html)
+    if (!isWarehousePage && category !== 'all') {
+        const allowedItems = categories[category] || [];
+        furnitureData = furnitureData.filter(item => allowedItems.includes(item['№№']));
     }
 
-    // Функция для рендеринга таблицы
-    function renderTable() {
-        // Динамическое создание заголовков
-        var headers = [];
-        if (isWarehousePage) {
-            headers = ['№', 'Название', 'Фото'];
+    // Загрузка изображений
+    let imageData = {};
+    try {
+        const response = await fetch(imagesUrl);
+        if (!response.ok) {
+            console.warn(`Файл ${imagesUrl} не найден или пуст. Используются заглушки.`);
+            imageData = {};
         } else {
-            headers = ['№', 'Название', 'Категория', 'Цена', 'Статус', 'Фото'];
+            imageData = await response.json();
         }
+    } catch (error) {
+        console.error(`Ошибка загрузки ${imagesUrl}:`, error);
+        imageData = {};
+    }
 
-        var headerRow = document.createElement('tr');
-        headers.forEach(function (header) {
-            var th = document.createElement('th');
+    // Динамическое создание заголовков
+    let headers = [];
+    if (isWarehousePage) {
+        headers = ['№', 'Название', 'Фото'];
+    } else {
+        headers = Object.keys(furnitureData[0] || {}).filter(header => header !== 'data-prefix' && header !== 'Пользовательская оценка');
+        if (isModernSofasPage) {
+            headers = [...headers, 'На продажу', 'Ценный предмет'];
+        } else {
+            headers = [...headers, 'Пользовательская оценка'];
+        }
+    }
+
+    const headerRow = document.createElement('tr');
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        if (header === 'Оценка (агент TwoTables), за 1 шт.') {
+            th.textContent = 'Оценка (агент TwoTables)';
+        } else {
             th.textContent = header;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
+        }
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
 
-        // Заполнение таблицы данными
-        furnitureData.forEach(function (item) {
-            var row = document.createElement('tr');
-            headers.forEach(function (header) {
-                var td = document.createElement('td');
-                td.setAttribute('data-label', header);
-                if (header === '№') {
-                    td.textContent = item['№'];
-                    td.style.textAlign = 'right';
-                } else if (header === 'Название') {
-                    td.textContent = item['Название'];
-                } else if (header === 'Категория' && !isWarehousePage) {
-                    td.textContent = item['Категория'];
-                } else if (header === 'Цена' && !isWarehousePage) {
-                    td.textContent = item['Цена'];
-                } else if (header === 'Статус' && !isWarehousePage) {
-                    td.textContent = item['Статус'];
-                } else if (header === 'Фото') {
-                    var prefix = isWarehousePage
-                        ? 'imgsklad' + (parseInt(item['№']) < 10 ? parseInt(item['№']) : item['№'].padStart(3, '0'))
-                        : 'item' + item['№'];
-                    var img = document.createElement('img');
-                    img.className = 'thumbnail';
-                    img.setAttribute('data-prefix', prefix);
-                    img.setAttribute('loading', 'lazy');
-                    img.setAttribute('alt', item['Название'] || 'Изображение');
-                    var imageList = imageData[prefix] || [];
-                    img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
-                    td.appendChild(img);
-                }
-                row.appendChild(td);
-            });
-            tbody.appendChild(row);
-        });
-
-        // Код для галереи
-        var thumbnails = document.querySelectorAll('.thumbnail');
-        thumbnails.forEach(function (thumbnail) {
-            var prefix = thumbnail.getAttribute('data-prefix');
-            var imageList = imageData[prefix] || [];
-            if (imageList && imageList.length > 0) {
-                thumbnail.src = imageList[0];
+    // Заполнение таблицы данными
+    let totalCost = 0;
+    furnitureData.forEach((item, rowIndex) => {
+        const row = document.createElement('tr');
+        headers.forEach(header => {
+            const td = document.createElement('td');
+            td.setAttribute('data-label', header === 'Оценка (агент TwoTables), за 1 шт.' ? 'Оценка (агент TwoTables)' : header);
+            if (header === 'Фото') {
+                const prefix = isWarehousePage
+                    ? 'imgsklad' + (parseInt(item['№']) < 10 ? parseInt(item['№']) : item['№'].padStart(3, '0'))
+                    : (item['data-prefix'] || `item${item['№№']}`);
+                const img = document.createElement('img');
+                img.className = 'thumbnail';
+                img.setAttribute('data-prefix', prefix);
+                img.setAttribute('loading', 'lazy');
+                img.setAttribute('alt', item['Название'] || 'Изображение');
+                const imageList = imageData[prefix] || [];
+                img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
+                td.appendChild(img);
+            } else if (header === 'Оценка (агент TwoTables), за 1 шт.' && !isWarehousePage) {
+                const cost = item[header] || 0;
+                td.textContent = cost > 0 ? cost.toLocaleString('ru-RU') + ' ₽' : '';
+                td.style.textAlign = 'right';
+                const quantity = parseInt(item['Количество, шт.']) || 1;
+                totalCost += cost * quantity;
+            } else if (header === 'На продажу' && isModernSofasPage) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'for-sale';
+                checkbox.checked = item['На продажу'] || false;
+                checkbox.addEventListener('change', () => {
+                    furnitureData[rowIndex]['На продажу'] = checkbox.checked;
+                });
+                td.appendChild(checkbox);
+                td.style.textAlign = 'center';
+            } else if (header === 'Ценный предмет' && isModernSofasPage) {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'valuable';
+                checkbox.checked = item['Ценный предмет'] || false;
+                checkbox.addEventListener('change', () => {
+                    furnitureData[rowIndex]['Ценный предмет'] = checkbox.checked;
+                });
+                td.appendChild(checkbox);
+                td.style.textAlign = 'center';
+            } else if (header === 'Пользовательская оценка' && !isModernSofasPage && !isWarehousePage) {
+                td.className = 'editable';
+                td.setAttribute('contenteditable', 'true');
+                td.textContent = item[header] || '';
+                td.style.textAlign = 'right';
+                td.addEventListener('input', (e) => {
+                    furnitureData[rowIndex][header] = e.target.textContent;
+                });
             } else {
-                thumbnail.src = 'img/placeholder.webp';
+                td.textContent = item[header] || '';
+                if (header === '№' || header === '№№' || header === 'Количество, шт.') {
+                    td.style.textAlign = 'right';
+                }
             }
+            row.appendChild(td);
         });
+        tbody.appendChild(row);
+    });
 
-        thumbnails.forEach(function (thumbnail) {
-            thumbnail.addEventListener('click', function () {
-                var prefix = thumbnail.getAttribute('data-prefix');
-                images = imageData[prefix] || [];
-                if (images.length === 0) return;
-                currentIndex = 0;
-                updateGallery();
-                modal.style.display = 'flex';
-            });
+    // Добавление итоговой строки (только для страниц, кроме warehouse.html)
+    if (!isWarehousePage) {
+        const totalRow = document.createElement('tr');
+        const totalLabelCell = document.createElement('td');
+        totalLabelCell.colSpan = headers.length - 1;
+        totalLabelCell.textContent = 'Итоговая стоимость (агент TwoTables):';
+        totalLabelCell.style.textAlign = 'right';
+        totalLabelCell.classList.add('total-cost');
+        const totalValueCell = document.createElement('td');
+        totalValueCell.textContent = totalCost.toLocaleString('ru-RU') + ' ₽';
+        totalValueCell.style.textAlign = 'right';
+        totalValueCell.classList.add('total-cost');
+        totalRow.appendChild(totalLabelCell);
+        totalRow.appendChild(totalValueCell);
+        tfoot.appendChild(totalRow);
+    }
+
+    // Открытие модального окна для подтверждения (только для modern_sofas)
+    if (saveButton) {
+        saveButton.addEventListener('click', () => {
+            confirmModal.style.display = 'flex';
         });
     }
 
-    function updateGallery() {
-        mainImage.src = images[currentIndex];
-        thumbnailGallery.innerHTML = '';
-        images.forEach(function (imgSrc, index) {
-            var img = document.createElement('img');
-            img.src = imgSrc;
-            if (index === currentIndex) {
-                img.classList.add('active');
-            }
-            img.addEventListener('click', function () {
-                currentIndex = index;
-                updateGallery();
-            });
-            thumbnailGallery.appendChild(img);
+    // Обработка кнопки "Да" в модальном окне подтверждения
+    if (confirmYes) {
+        confirmYes.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+            userInfoModal.style.display = 'flex';
         });
-        arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
-        arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
     }
 
-    arrowLeft.addEventListener('click', function () {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateGallery();
-        }
-    });
+    // Обработка кнопки "Нет" в модальном окне подтверждения
+    if (confirmNo) {
+        confirmNo.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+        });
+    }
 
-    arrowRight.addEventListener('click', function () {
-        if (currentIndex < images.length - 1) {
-            currentIndex++;
-            updateGallery();
-        }
-    });
+    // Закрытие модального окна подтверждения при клике на крестик
+    if (confirmModal) {
+        confirmModal.querySelector('.close').addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+        });
 
-    closeBtn.addEventListener('click', function () {
-        modal.style.display = 'none';
-    });
+        // Закрытие модального окна подтверждения при клике вне окна
+        confirmModal.addEventListener('click', (e) => {
+            if (e.target === confirmModal) {
+                confirmModal.style.display = 'none';
+            }
+        });
+    }
 
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
+    // Сохранение данных после ввода имени и телефона
+    if (userInfoForm) {
+        userInfoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userName = document.getElementById('userName').value.trim();
+            const userPhone = document.getElementById('userPhone').value.trim();
 
-    fullscreenBtn.addEventListener('click', function () {
-        if (mainImage.requestFullscreen) {
-            mainImage.requestFullscreen();
-        } else if (mainImage.mozRequestFullScreen) {
-            mainImage.mozRequestFullScreen();
-        } else if (mainImage.webkitRequestFullscreen) {
-            mainImage.webkitRequestFullscreen();
-        } else if (mainImage.msRequestFullscreen) {
-            mainImage.msRequestFullscreen();
-        }
-    });
-});
+            if (!userName) {
+                alert('Пожалуйста, введите ваше имя.');
+                return;
+            }
+
+            try {
+                // Формирование сообщения для Telegram
+                const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
+                const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
+                let telegramMessage = `🔔 Новые данные по современной мебели и диванам от ${userName} (${userPhone})\n`;
+                telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
+                if (itemsWithSelection.length > 0) {
+                    itemsWithSelection.forEach(item => {
+                        telegramMessage += `- №: ${item['№№']}\n`;
+                        telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
+                        telegramMessage += `  На продажу: ${item['На продажу'] ? 'Да' : 'Нет'}\n`;
+                        telegramMessage += `  Ценный предмет: ${item['Ценный предмет'] ? 'Да' : 'Нет'}\n\n`;
+                    });
+                } else {
+                    telegramMessage += 'Нет выбранных предметов.\n';
+                }
+
+                // Отправка в Telegram через iframe
+                const iframe = document.createElement('iframe');
+                iframe.src = 'telegram-proxy.html';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                iframe.onload = () => {
+                    iframe.contentWindow.postMessage({ message: telegramMessage }, 'https://gvantonov.github.io');
+                };
+
+                // Сохранение данных в Firestore
+                await addDoc(collection(db, 'modern_sofas_submissions'), {
+                    userName: userName,
+                    userPhone: userPhone,
+                    data: furnitureData,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Заменяем содержимое модального окна на сообщение об успешной отправке
+                const modalContent = userInfoModal.querySelector('.modal-content');
+                modalContent.innerHTML = `
+                    <span class="close">×</span>
+                    <div class="success-message">
+                        <p>Ваши данные успешно сохранены и отправлены.</p>
+                        <p>Если у вас есть дополнительные вопросы — напишите в WhatsApp</p>
+                        <a href="http://wa.me/79153555202" target="_blank" class="whatsapp-link">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3C
