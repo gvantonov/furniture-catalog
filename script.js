@@ -234,20 +234,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // Формирование сообщения для Telegram
-            const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
-            const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
-            let telegramMessage = `🔔 Новые данные по современной мебели и диванам от ${userName} (${userPhone})\n`;
-            telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
-            if (itemsWithSelection.length > 0) {
-                itemsWithSelection.forEach(item => {
-                    telegramMessage += `- №: ${item['№№']}\n`;
-                    telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
-                    telegramMessage += `  На продажу: ${item['На продажу'] ? 'Да' : 'Нет'}\n`;
-                    telegramMessage += `  Ценный предмет: ${item['Ценный предмет'] ? 'Да' : 'Нет'}\n\n`;
-                });
-            } else {
-                telegramMessage += 'Нет выбранных предметов.\n';
-            }
+const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
+const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
+let telegramMessage = `🔔 Результаты опроса от ${userName} (${userPhone})\n`;
+telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
+if (itemsWithSelection.length > 0) {
+    itemsWithSelection.forEach(item => {
+        telegramMessage += `- №: ${item['№№']}\n`;
+        telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
+        telegramMessage += `  На продажу: ${item['На продажу'] ? 'Да' : 'Нет'}\n`;
+        telegramMessage += `  Ценный предмет: ${item['Ценный предмет'] ? 'Да' : 'Нет'}\n\n`;
+    });
+} else {
+    telegramMessage += 'Нет выбранных предметов.\n';
+}
 
             // Отправка в Telegram через iframe
             const iframe = document.createElement('iframe');
