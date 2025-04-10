@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; object-src 'none'; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://api.telegram.org; img-src 'self' https://*.github.io data: /img/sklad/ /img/;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; style-src 'self'; object-src 'none'; connect-src 'self' https://firestore.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://api.telegram.org; img-src 'self' https://*.github.io data:;">
     <title>Мебель на складе ОСЦ</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -18,7 +18,7 @@
                 <li><a href="modern_expensive.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
                 <li><a href="modern_attribution.html?category=modern_attribution" class="tab">Современная (атрибуция)</a></li>
                 <li><a href="sofas.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
-                <li><a href="warehouse.html" class="tab">Мебель на складе ОСЦ</a></li>
+                <li><a href="warehouse.html" class="tab active">Мебель на складе ОСЦ</a></li>
                 <li><a href="visitor_stats.php" class="tab">Статистика посетителей</a></li>
             </ul>
         </nav>
@@ -31,18 +31,18 @@
 
         <!-- Модальное окно галереи -->
         <div id="galleryModal" class="modal">
-            <span class="close">×</span>
+            <span class="close">&times;</span>
             <div class="modal-content">
                 <img id="mainImage" class="main-image" src="" alt="Main Image">
                 <div class="thumbnail-gallery" id="thumbnailGallery"></div>
-                <span class="arrow arrow-left" id="arrowLeft">◀</span>
-                <span class="arrow arrow-right" id="arrowRight">▶</span>
+                <span class="arrow arrow-left" id="arrowLeft">&lt;</span>
+                <span class="arrow arrow-right" id="arrowRight">&gt;</span>
                 <button class="fullscreen-btn" id="fullscreenBtn">Полноэкранный режим</button>
             </div>
         </div>
     </div>
 
-    <script type="module" src="warehouse_script.js"></script>
+    <script src="script.js"></script>
     <!-- Скрипт для отслеживания посетителей -->
     <script>
         fetch('track_visitor.php', {
