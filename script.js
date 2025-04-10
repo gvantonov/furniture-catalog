@@ -301,4 +301,114 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p>Ваши данные успешно сохранены и отправлены.</p>
                         <p>Если у вас есть дополнительные вопросы — напишите в WhatsApp</p>
                         <a href="http://wa.me/79153555202" target="_blank" class="whatsapp-link">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3C
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' class='whatsapp-icon'%3E%3Cpath fill='%2325D366' d='M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.218 1.617 6.042L0 24l6.058-1.587A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.001c-1.874 0-3.627-.497-5.144-1.357l-.357-.212-3.6.943.961-3.518-.226-.37A9.956 9.956 0 0 1 2 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10zm5.618-4.943c-.308-.154-1.827-.904-2.11-.998-.282-.094-.488-.146-.694.146-.206.292-.798.998-.975 1.202-.177.204-.354.22-.652.073-.297-.147-1.254-.46-2.39-1.467-.883-.784-1.48-1.753-1.657-2.045-.177-.292-.018-.45.132-.596.135-.132.304-.346.456-.526.153-.18.206-.308.31-.518.103-.21.051-.394-.026-.553-.077-.16-.694-1.672-.952-2.29-.252-.598-.508-.517-.694-.517-.187 0-.399-.02-.611-.02-.212 0-.558.073-.852.368-.294.295-1.126 1.1-1.126 2.682 0 1.582 1.152 3.11 1.314 3.324.161.214 2.267 3.465 5.494 4.858.766.332 1.366.531 1.834.681.772.247 1.475.212 2.03.129.619-.094 1.827-.747 2.084-1.467.257-.72.257-1.34.18-1.467-.077-.127-.283-.201-.591-.355z'/%3E%3C/svg%3E" alt="WhatsApp" class="whatsapp-icon">
+                            Написать
+                        </a>
+                    </div>
+                `;
+
+                // Обновляем обработчик для кнопки закрытия
+                const newCloseBtn = modalContent.querySelector('.close');
+                newCloseBtn.addEventListener('click', () => {
+                    userInfoModal.style.display = 'none';
+                });
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                alert('Ошибка при сохранении данных. Данные выведены в консоль.');
+                console.log(JSON.stringify({ userName, userPhone, data: furnitureData }, null, 2));
+            }
+        });
+    }
+
+    if (userInfoCloseBtn) {
+        userInfoCloseBtn.addEventListener('click', () => {
+            userInfoModal.style.display = 'none';
+        });
+    }
+
+    if (userInfoModal) {
+        userInfoModal.addEventListener('click', (e) => {
+            if (e.target === userInfoModal) {
+                userInfoModal.style.display = 'none';
+            }
+        });
+    }
+
+    // Код для галереи
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach(thumbnail => {
+        const prefix = thumbnail.getAttribute('data-prefix');
+        const imageList = imageData[prefix] || [];
+        if (imageList && imageList.length > 0) {
+            thumbnail.src = imageList[0];
+        } else {
+            thumbnail.src = 'img/placeholder.webp';
+        }
+    });
+
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            const prefix = thumbnail.getAttribute('data-prefix');
+            images = imageData[prefix] || [];
+            if (images.length === 0) return;
+            currentIndex = 0;
+            updateGallery();
+            modal.style.display = 'flex';
+        });
+    });
+
+    function updateGallery() {
+        mainImage.src = images[currentIndex];
+        thumbnailGallery.innerHTML = '';
+        images.forEach((imgSrc, index) => {
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            if (index === currentIndex) {
+                img.classList.add('active');
+            }
+            img.addEventListener('click', () => {
+                currentIndex = index;
+                updateGallery();
+            });
+            thumbnailGallery.appendChild(img);
+        });
+        arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
+        arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
+    }
+
+    arrowLeft.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateGallery();
+        }
+    });
+
+    arrowRight.addEventListener('click', () => {
+        if (currentIndex < images.length - 1) {
+            currentIndex++;
+            updateGallery();
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+        if (mainImage.requestFullscreen) {
+            mainImage.requestFullscreen();
+        } else if (mainImage.mozRequestFullScreen) {
+            mainImage.mozRequestFullScreen();
+        } else if (mainImage.webkitRequestFullscreen) {
+            mainImage.webkitRequestFullscreen();
+        } else if (mainImage.msRequestFullscreen) {
+            mainImage.msRequestFullscreen();
+        }
+    });
+});
