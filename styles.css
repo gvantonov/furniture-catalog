@@ -168,7 +168,6 @@ th {
     font-style: italic;
 }
 
-
 /* Плавающая кнопка "Сохранить" */
 .floating-save {
     position: fixed;
@@ -251,6 +250,149 @@ th {
 .whatsapp-icon {
     width: 24px;
     height: 24px;
+}
+
+/* Фиксированный заголовок и навигация */
+.fixed-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+}
+
+.fixed-header h1 {
+    margin: 0 20px;
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+}
+
+/* Стили для вкладок */
+nav {
+    margin: 10px 0;
+}
+
+.tabs {
+    list-style: none;
+    padding: 0;
+    margin: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.tabs li {
+    display: inline;
+}
+
+.tab {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px 5px 0 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.tab:hover {
+    background-color: #e0e0e0;
+    color: #d32f2f;
+}
+
+.tab.active {
+    background-color: #fff;
+    color: #d32f2f;
+    border-bottom: 3px solid #d32f2f;
+    font-weight: bold;
+}
+
+/* Контент под фиксированным заголовком */
+.content {
+    padding: 20px;
+    padding-bottom: 100px; /* Добавляем отступ снизу, чтобы итоговая сумма не перекрывалась */
+    max-height: calc(100vh - 150px); /* Ограничиваем высоту, учитывая фиксированный заголовок */
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+}
+
+/* Таблица */
+#furnitureTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+/* Фиксированный заголовок таблицы */
+#furnitureTable thead {
+    position: sticky;
+    top: 0; /* Прикрепляем к верхней части контейнера */
+    background-color: #f2f2f2; /* Цвет фона заголовка */
+    z-index: 10; /* Устанавливаем z-index, чтобы заголовок был выше содержимого */
+}
+
+/* Убедимся, что ячейки заголовка имеют правильный отступ */
+#furnitureTable th {
+    background-color: #f2f2f2;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
+    border-bottom: 2px solid #ddd; /* Добавляем границу для визуального разделения */
+}
+
+/* Ячейки таблицы */
+#furnitureTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* Стили для чекбоксов */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Стили для модального окна подтверждения */
+#confirmModal .modal-content {
+    text-align: center;
+}
+
+#confirmModal h2 {
+    margin-bottom: 20px;
+}
+
+#confirmYes, #confirmNo {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#confirmYes {
+    background-color: #28a745;
+    color: white;
+}
+
+#confirmYes:hover {
+    background-color: #218838;
+}
+
+#confirmNo {
+    background-color: #dc3545;
+    color: white;
+}
+
+#confirmNo:hover {
+    background-color: #c82333;
 }
 
 /* Медиа-запросы для iPad Air 11" (820px–1180px) */
@@ -340,11 +482,20 @@ th {
 
 /* Медиа-запросы для смартфонов */
 @media (max-width: 768px) {
+    .content {
+        max-height: calc(100vh - 200px); /* Учитываем больший фиксированный заголовок на мобильных */
+        overflow-y: auto;
+    }
+
     #furnitureTable {
         display: block; /* Преобразуем таблицу в блочный элемент */
         overflow-x: auto; /* Горизонтальная прокрутка для таблицы */
         -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
         font-size: 12px; /* Уменьшаем шрифт для смартфонов */
+    }
+
+    #furnitureTable thead {
+        position: static; /* Отключаем фиксацию на мобильных, так как таблица преобразуется в блочный элемент */
     }
 
     #furnitureTable thead,
@@ -381,73 +532,7 @@ th {
     .modal-content {
         max-width: 90%;
     }
-}
-/* Фиксированный заголовок и навигация */
-.fixed-header {
-    position: sticky;
-    top: 0;
-    background-color: #fff;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 10px 0;
-}
 
-.fixed-header h1 {
-    margin: 0 20px;
-    font-size: 24px;
-    color: #333;
-    text-align: center;
-}
-
-/* Стили для вкладок */
-nav {
-    margin: 10px 0;
-}
-
-.tabs {
-    list-style: none;
-    padding: 0;
-    margin: 0 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    border-bottom: 2px solid #e0e0e0;
-}
-
-.tabs li {
-    display: inline;
-}
-
-.tab {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #f5f5f5;
-    color: #333;
-    text-decoration: none;
-    border-radius: 5px 5px 0 0;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.tab:hover {
-    background-color: #e0e0e0;
-    color: #d32f2f;
-}
-
-.tab.active {
-    background-color: #fff;
-    color: #d32f2f;
-    border-bottom: 3px solid #d32f2f;
-    font-weight: bold;
-}
-
-/* Контент под фиксированным заголовком */
-.content {
-    padding: 20px;
-    padding-bottom: 100px; /* Добавляем отступ снизу, чтобы итоговая сумма не перекрывалась */
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 768px) {
     .content {
         padding-bottom: 120px; /* Увеличиваем отступ на мобильных устройствах */
     }
@@ -466,47 +551,4 @@ nav {
         font-size: 10px;
         max-width: 150px;
     }
-}
-
-/* Стили для чекбоксов */
-input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-}
-
-/* Стили для модального окна подтверждения */
-#confirmModal .modal-content {
-    text-align: center;
-}
-
-#confirmModal h2 {
-    margin-bottom: 20px;
-}
-
-#confirmYes, #confirmNo {
-    padding: 10px 20px;
-    margin: 0 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#confirmYes {
-    background-color: #28a745;
-    color: white;
-}
-
-#confirmYes:hover {
-    background-color: #218838;
-}
-
-#confirmNo {
-    background-color: #dc3545;
-    color: white;
-}
-
-#confirmNo:hover {
-    background-color: #c82333;
 }
