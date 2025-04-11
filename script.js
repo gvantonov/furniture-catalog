@@ -38,12 +38,11 @@ const categories = {
 const urlParams = new URLSearchParams(window.location.search);
 const category = urlParams.get('category') || 'all';
 
-// Проверка, является ли текущая страница modern_sofas
-const isModernSofasPage = category === 'modern_sofas';
-
-// Проверка, является ли текущая страница warehouse.html
+// Проверка, является ли текущая страница modern_sofas, warehouse или survey
 const currentPage = window.location.pathname.split('/').pop();
+const isModernSofasPage = category === 'modern_sofas';
 const isWarehousePage = currentPage === 'warehouse.html';
+const isSurveyPage = currentPage === 'survey.html';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const table = document.getElementById('furnitureTable');
@@ -68,30 +67,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     let images = [];
     let furnitureData = [];
 
-    // Загрузка данных в зависимости от страницы
-    let dataUrl = isWarehousePage ? 'warehouse_data.json' : 'furniture_catalog.json';
-    let imagesUrl = isWarehousePage ? 'warehouse_images.json' : 'images.json';
-
     // Загрузка данных
+    let catalogData = [];
+    let warehouseData = [];
+    let imageData = {};
+
+    // Загрузка furniture_catalog.json
     try {
-        const response = await fetch(dataUrl);
+        const response = await fetch('furniture_catalog.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        furnitureData = await response.json();
+        catalogData = await response.json();
     } catch (error) {
-        console.error(`Ошибка загрузки ${dataUrl}:`, error);
-        return;
+        console.error('Ошибка загрузки furniture_catalog.json:', error);
     }
 
-    // Фильтрация данных по категории (только для страниц, кроме warehouse.html)
-    if (!isWarehousePage && category !== 'all') {
+    // Фильтрация данных для modern_sofas (для survey.html и modern_sofas.html)
+    let modernSofasData = [];
+    if (isModernSofasPage || isSurveyPage) {
+        const allowedItems = categories['modern_sofas'] || [];
+        modernSofasData = catalogData.filter(item => allowedItems.includes(item['№№']));
+    }
+
+    // Загрузка warehouse_data.json (для survey.html и warehouse.html)
+    if (isSurveyPage || isWarehousePage) {
+        try {
+            const response = await fetch('warehouse_data.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            warehouseData = await response.json();
+            // Нормализуем данные из warehouse_data.json, добавляя пустые значения для остальных столбцов
+            warehouseData = warehouseData.map(item => ({
+                "№№": item["№"],
+                "Название": item["Название"],
+                "Категория": "",
+                "Цена": "",
+                "Статус": "",
+                "Количество, шт.": "",
+                "Оценка (агент TwoTables), за 1 шт.": "",
+                "data-prefix": 'imgsklad' + (parseInt(item['№']) < 10 ? parseInt(item['№']) : item['№'].padStart(3, '0')),
+                "source": "warehouse"
+            }));
+        } catch (error) {
+            console.error('Ошибка загрузки warehouse_data.json:', error);
+        }
+    }
+
+    // Объединяем данные для survey.html
+    if (isSurveyPage) {
+        furnitureData = [...modernSofasData, ...warehouseData];
+    } else if (isWarehousePage) {
+        furnitureData = warehouseData;
+    } else if (isModernSofasPage) {
+        furnitureData = modernSofasData;
+    } else {
+        furnitureData = catalogData;
+    }
+
+    // Фильтрация данных по категории (только для страниц, кроме warehouse.html, survey.html и modern_sofas.html)
+    if (!isWarehousePage && !isSurveyPage && !isModernSofasPage && category !== 'all') {
         const allowedItems = categories[category] || [];
         furnitureData = furnitureData.filter(item => allowedItems.includes(item['№№']));
     }
 
     // Загрузка изображений
-    let imageData = {};
+    let imagesUrl = isWarehousePage ? 'warehouse_images.json' : 'images.json';
     try {
         const response = await fetch(imagesUrl);
         if (!response.ok) {
@@ -105,13 +147,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         imageData = {};
     }
 
+    // Загрузка warehouse_images.json для survey.html (дополнительно)
+    if (isSurveyPage) {
+        try {
+            const response = await fetch('warehouse_images.json');
+            if (!response.ok) {
+                console.warn('Файл warehouse_images.json не найден или пуст. Используются заглушки.');
+            } else {
+                const warehouseImages = await response.json();
+                imageData = { ...imageData, ...warehouseImages };
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки warehouse_images.json:', error);
+        }
+    }
+
     // Динамическое создание заголовков
     let headers = [];
     if (isWarehousePage) {
         headers = ['№', 'Название', 'Фото'];
     } else {
-        headers = Object.keys(furnitureData[0] || {}).filter(header => header !== 'data-prefix' && header !== 'Пользовательская оценка');
-        if (isModernSofasPage) {
+        headers = Object.keys(catalogData[0] || {}).filter(header => header !== 'data-prefix' && header !== 'Пользовательская оценка');
+        if (isModernSofasPage || isSurveyPage) {
             headers = [...headers, 'На продажу', 'Ценный предмет'];
         } else {
             headers = [...headers, 'Пользовательская оценка'];
@@ -138,9 +195,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const td = document.createElement('td');
             td.setAttribute('data-label', header === 'Оценка (агент TwoTables), за 1 шт.' ? 'Оценка (агент TwoTables)' : header);
             if (header === 'Фото') {
-                const prefix = isWarehousePage
-                    ? 'imgsklad' + (parseInt(item['№']) < 10 ? parseInt(item['№']) : item['№'].padStart(3, '0'))
-                    : (item['data-prefix'] || `item${item['№№']}`);
+                const prefix = item['data-prefix'] || (item['source'] === 'warehouse'
+                    ? 'imgsklad' + (parseInt(item['№№']) < 10 ? parseInt(item['№№']) : item['№№'].padStart(3, '0'))
+                    : `item${item['№№']}`);
                 const img = document.createElement('img');
                 img.className = 'thumbnail';
                 img.setAttribute('data-prefix', prefix);
@@ -155,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 td.style.textAlign = 'right';
                 const quantity = parseInt(item['Количество, шт.']) || 1;
                 totalCost += cost * quantity;
-            } else if (header === 'На продажу' && isModernSofasPage) {
+            } else if (header === 'На продажу' && (isModernSofasPage || isSurveyPage)) {
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'for-sale';
@@ -165,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 td.appendChild(checkbox);
                 td.style.textAlign = 'center';
-            } else if (header === 'Ценный предмет' && isModernSofasPage) {
+            } else if (header === 'Ценный предмет' && (isModernSofasPage || isSurveyPage)) {
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'valuable';
@@ -175,7 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 td.appendChild(checkbox);
                 td.style.textAlign = 'center';
-            } else if (header === 'Пользовательская оценка' && !isModernSofasPage && !isWarehousePage) {
+            } else if (header === 'Пользовательская оценка' && !isModernSofasPage && !isSurveyPage && !isWarehousePage) {
                 td.className = 'editable';
                 td.setAttribute('contenteditable', 'true');
                 td.textContent = item[header] || '';
@@ -211,7 +268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         tfoot.appendChild(totalRow);
     }
 
-    // Открытие модального окна для подтверждения (только для modern_sofas)
+    // Открытие модального окна для подтверждения (только для modern_sofas и survey)
     if (saveButton) {
         saveButton.addEventListener('click', () => {
             confirmModal.style.display = 'flex';
@@ -263,12 +320,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Формирование сообщения для Telegram
                 const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
                 const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
-                let telegramMessage = `🔔 Новые данные по современной мебели и диванам от ${userName} (${userPhone})\n`;
+                let telegramMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName} (${userPhone})\n`;
                 telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
                 if (itemsWithSelection.length > 0) {
                     itemsWithSelection.forEach(item => {
                         telegramMessage += `- №: ${item['№№']}\n`;
                         telegramMessage += `  Наименование: ${item['Название'] || 'Не указано'}\n`;
+                        telegramMessage += `  Источник: ${item['source'] === 'warehouse' ? 'Склад' : 'Modern Sofas'}\n`;
                         telegramMessage += `  На продажу: ${item['На продажу'] ? 'Да' : 'Нет'}\n`;
                         telegramMessage += `  Ценный предмет: ${item['Ценный предмет'] ? 'Да' : 'Нет'}\n\n`;
                     });
@@ -286,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 };
 
                 // Сохранение данных в Firestore
-                await addDoc(collection(db, 'modern_sofas_submissions'), {
+                await addDoc(collection(db, 'survey_submissions'), {
                     userName: userName,
                     userPhone: userPhone,
                     data: furnitureData,
