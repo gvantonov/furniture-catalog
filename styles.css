@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    overflow-x: auto; /* Разрешаем горизонтальную прокрутку для body */
+    overflow-x: auto;
 }
 
 .container {
@@ -17,7 +17,7 @@ table {
     max-width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    table-layout: auto; /* Автоматическая компоновка */
+    table-layout: auto;
 }
 
 th,
@@ -26,27 +26,25 @@ td {
     padding: 8px;
     text-align: left;
     box-sizing: border-box;
-    word-wrap: break-word; /* Перенос текста в ячейках */
-    white-space: normal; /* Разрешаем перенос текста */
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 th {
     background-color: #f2f2f2;
-    text-align: center; /* Центрируем текст в заголовках */
-    white-space: normal; /* Разрешаем переносы в заголовках */
-    word-wrap: break-word; /* Разрешаем перенос слов */
-    hyphens: auto; /* Добавляем переносы для длинных слов */
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
-/* Миниатюры */
 .thumbnail {
-    max-width: 150px; /* Базовая ширина миниатюр */
-    height: auto; /* Сохраняем пропорции */
+    max-width: 150px;
+    height: auto;
     cursor: pointer;
     object-fit: cover;
 }
 
-/* Модальные окна и галерея */
 .modal {
     display: none;
     position: fixed;
@@ -69,7 +67,7 @@ th {
     max-height: 90vh;
     text-align: center;
     color: #fff;
-    overflow-y: auto; /* Прокрутка внутри модального окна при необходимости */
+    overflow-y: auto;
 }
 
 .main-image {
@@ -163,12 +161,11 @@ th {
 }
 
 .editable:empty:before {
-    content: 'Предложите Вашу цену'; /* Обновляем замещающий текст */
+    content: 'Предложите Вашу цену';
     color: #6c757d;
     font-style: italic;
 }
 
-/* Плавающая кнопка "Сохранить" */
 .floating-save {
     position: fixed;
     bottom: 20px;
@@ -183,10 +180,10 @@ th {
     background-color: #28a745;
     color: white;
     border: none;
-    padding: 10px 20px; /* Уменьшаем размер кнопки */
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px; /* Уменьшаем шрифт */
+    font-size: 16px;
     transition: background-color 0.3s;
 }
 
@@ -196,10 +193,10 @@ th {
 
 .save-note {
     margin-top: 5px;
-    font-size: 12px; /* Уменьшаем шрифт текста */
+    font-size: 12px;
     color: #666;
     text-align: right;
-    max-width: 200px; /* Ограничиваем ширину текста */
+    max-width: 200px;
 }
 
 #userInfoModal .modal-content {
@@ -252,7 +249,6 @@ th {
     height: 24px;
 }
 
-/* Фиксированный заголовок и навигация */
 .fixed-header {
     position: sticky;
     top: 0;
@@ -269,7 +265,6 @@ th {
     text-align: center;
 }
 
-/* Стили для вкладок */
 nav {
     margin: 10px 0;
 }
@@ -310,40 +305,35 @@ nav {
     font-weight: bold;
 }
 
-/* Контент под фиксированным заголовком */
 .content {
     padding: 20px;
-    padding-bottom: 100px; /* Добавляем отступ снизу, чтобы итоговая сумма не перекрывалась */
-    max-height: calc(100vh - 150px); /* Ограничиваем высоту, учитывая фиксированный заголовок */
-    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+    padding-bottom: 100px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
 }
 
-/* Таблица */
 #furnitureTable {
     width: 100%;
     border-collapse: collapse;
     table-layout: auto;
 }
 
-/* Фиксированный заголовок таблицы */
 #furnitureTable thead {
     position: sticky;
-    top: 0; /* Прикрепляем к верхней части контейнера */
-    background-color: #f2f2f2; /* Цвет фона заголовка */
-    z-index: 10; /* Устанавливаем z-index, чтобы заголовок был выше содержимого */
+    top: 0;
+    background-color: #f2f2f2;
+    z-index: 10;
 }
 
-/* Убедимся, что ячейки заголовка имеют правильный отступ */
 #furnitureTable th {
     background-color: #f2f2f2;
     text-align: center;
     white-space: normal;
     word-wrap: break-word;
     hyphens: auto;
-    border-bottom: 2px solid #ddd; /* Добавляем границу для визуального разделения */
+    border-bottom: 2px solid #ddd;
 }
 
-/* Ячейки таблицы */
 #furnitureTable td {
     border: 1px solid #ddd;
     padding: 8px;
@@ -352,14 +342,12 @@ nav {
     white-space: normal;
 }
 
-/* Стили для чекбоксов */
 input[type="checkbox"] {
     width: 20px;
     height: 20px;
     cursor: pointer;
 }
 
-/* Стили для модального окна подтверждения */
 #confirmModal .modal-content {
     text-align: center;
 }
@@ -395,38 +383,36 @@ input[type="checkbox"] {
     background-color: #c82333;
 }
 
-/* Медиа-запросы для iPad Air 11" (820px–1180px) */
 @media (min-width: 820px) and (max-width: 1180px) {
     #furnitureTable {
-        overflow-x: auto; /* Добавляем горизонтальную прокрутку для планшетов */
-        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .thumbnail {
-        max-width: 100px; /* Уменьшаем размер миниатюр для iPad Air */
+        max-width: 100px;
         height: auto;
     }
 
     #furnitureTable th,
     #furnitureTable td {
         padding: 5px;
-        font-size: 12px; /* Уменьшаем шрифт */
+        font-size: 12px;
     }
 
     #furnitureTable td img {
-        max-width: 80px; /* Уменьшаем изображения в ячейках */
+        max-width: 80px;
         height: auto;
     }
 }
 
-/* Медиа-запросы для планшетов (11-13 дюймов, ~834-1194px) */
 @media (min-width: 834px) and (max-width: 1194px) {
     #furnitureTable {
-        overflow-x: auto; /* Добавляем горизонтальную прокрутку */
+        overflow-x: auto;
     }
 
     .thumbnail {
-        max-width: 120px; /* Уменьшаем размер миниатюр для планшетов */
+        max-width: 120px;
         height: auto;
     }
 
@@ -437,15 +423,14 @@ input[type="checkbox"] {
     }
 
     #furnitureTable td img {
-        max-width: 100px; /* Уменьшаем изображения в ячейках */
+        max-width: 100px;
         height: auto;
     }
 }
 
-/* Медиа-запросы для ноутбуков/ПК (13-16 дюймов, ~1280-1920px) */
 @media (min-width: 1280px) and (max-width: 1920px) {
     .thumbnail {
-        max-width: 150px; /* Оптимизируем размер для больших экранов */
+        max-width: 150px;
         height: auto;
     }
 
@@ -456,17 +441,16 @@ input[type="checkbox"] {
     }
 
     #furnitureTable td img {
-        max-width: 120px; /* Уменьшаем изображения в ячейках */
+        max-width: 120px;
         height: auto;
     }
 }
 
-/* Медиа-запросы для узких экранов (десктоп и планшеты) */
 @media (max-width: 1024px) {
     #furnitureTable {
-        overflow-x: auto; /* Горизонтальная прокрутка для узких экранов */
-        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
-        font-size: 14px; /* Уменьшаем шрифт для планшетов */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 14px;
     }
 
     #furnitureTable th,
@@ -475,27 +459,26 @@ input[type="checkbox"] {
     }
 
     .thumbnail {
-        max-width: 100px; /* Уменьшаем миниатюры для планшетов */
+        max-width: 100px;
         height: auto;
     }
 }
 
-/* Медиа-запросы для смартфонов */
 @media (max-width: 768px) {
     .content {
-        max-height: calc(100vh - 200px); /* Учитываем больший фиксированный заголовок на мобильных */
+        max-height: calc(100vh - 200px);
         overflow-y: auto;
     }
 
     #furnitureTable {
-        display: block; /* Преобразуем таблицу в блочный элемент */
-        overflow-x: auto; /* Горизонтальная прокрутка для таблицы */
-        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
-        font-size: 12px; /* Уменьшаем шрифт для смартфонов */
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 12px;
     }
 
     #furnitureTable thead {
-        position: static; /* Отключаем фиксацию на мобильных, так как таблица преобразуется в блочный элемент */
+        position: static;
     }
 
     #furnitureTable thead,
@@ -507,7 +490,7 @@ input[type="checkbox"] {
     }
 
     #furnitureTable th {
-        display: none; /* Скрываем заголовки на маленьких экранах */
+        display: none;
     }
 
     #furnitureTable td {
@@ -518,14 +501,14 @@ input[type="checkbox"] {
     }
 
     #furnitureTable td:before {
-        content: attr(data-label); /* Используем data-label для отображения названий колонок */
+        content: attr(data-label);
         font-weight: bold;
         margin-right: 10px;
         flex: 1;
     }
 
     #furnitureTable td img {
-        max-width: 80px; /* Уменьшаем изображения для смартфонов */
+        max-width: 80px;
         height: auto;
     }
 
@@ -534,7 +517,7 @@ input[type="checkbox"] {
     }
 
     .content {
-        padding-bottom: 120px; /* Увеличиваем отступ на мобильных устройствах */
+        padding-bottom: 120px;
     }
 
     .floating-save {
@@ -550,5 +533,58 @@ input[type="checkbox"] {
     .save-note {
         font-size: 10px;
         max-width: 150px;
+    }
+}
+
+/* Специфичные стили для survey.html */
+.survey-page #furnitureTable {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.survey-page #furnitureTable th:nth-child(8), /* На продажу */
+.survey-page #furnitureTable td:nth-child(8),
+.survey-page #furnitureTable th:nth-child(9), /* Ценный предмет */
+.survey-page #furnitureTable td:nth-child(9) {
+    min-width: 80px;
+    width: auto;
+    white-space: normal;
+}
+
+.survey-page #furnitureTable th:nth-child(6), /* Наименование */
+.survey-page #furnitureTable td:nth-child(6),
+.survey-page #furnitureTable th:nth-child(7), /* Гарнитур */
+.survey-page #furnitureTable td:nth-child(7) {
+    width: 100px;
+    max-width: 100px;
+    white-space: normal;
+}
+
+.survey-page #furnitureTable .thumbnail {
+    max-width: 180px;
+    height: auto;
+}
+
+@media (min-width: 820px) and (max-width: 1180px) {
+    .survey-page #furnitureTable .thumbnail {
+        max-width: 120px;
+    }
+}
+
+@media (min-width: 834px) and (max-width: 1194px) {
+    .survey-page #furnitureTable .thumbnail {
+        max-width: 144px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .survey-page #furnitureTable .thumbnail {
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .survey-page #furnitureTable td img {
+        max-width: 96px;
     }
 }
