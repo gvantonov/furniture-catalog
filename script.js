@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Фильтрация данных по категории (только для страниц, кроме warehouse.html, survey.html и modern_sofas.html)
     if (!isWarehousePage && !isSurveyPage && !isModernSofasPage && category !== 'all') {
         const allowedItems = categories[category] || [];
-        furnitureData = furnitureData.filter(item => allowedItems.includes(item['№№']));
+        furnitureData = filter(item => allowedItems.includes(item['№№']));
     }
 
     // Загрузка изображений
@@ -337,8 +337,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userName = document.getElementById('userName').value.trim();
             const userPhone = document.getElementById('userPhone').value.trim();
 
-            if (!userName || !userPhone) {
-                alert('Пожалуйста, введите ваше имя и номер телефона.');
+            if (!userName) {
+                alert('Пожалуйста, введите ваше имя.');
                 return;
             }
 
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Формирование сообщения для Telegram
                 const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
                 const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
-                let telegramMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName} (${userPhone})\n`;
+                let telegramMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName}${userPhone ? ` (${userPhone})` : ''}\n`;
                 telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
                 if (itemsWithSelection.length > 0) {
                     itemsWithSelection.forEach(item => {
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (telegramMessage.length <= maxMessageLength) {
                     messages.push(telegramMessage);
                 } else {
-                    let currentMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName} (${userPhone})\n`;
+                    let currentMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName}${userPhone ? ` (${userPhone})` : ''}\n`;
                     currentMessage += `Время (Москва): ${moscowTime}\n\n`;
                     let currentLength = currentMessage.length;
                     let itemMessages = itemsWithSelection.map(item => {
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             currentLength += itemMessage.length;
                         } else {
                             messages.push(currentMessage);
-                            currentMessage = `🔔 Продолжение данных от ${userName} (${userPhone})\n\n` + itemMessage;
+                            currentMessage = `🔔 Продолжение данных от ${userName}${userPhone ? ` (${userPhone})` : ''}\n\n` + itemMessage;
                             currentLength = currentMessage.length;
                         }
                     }
@@ -397,12 +397,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Отправка всех частей сообщения в Telegram
                 for (let i = 0; i < messages.length; i++) {
-                    try {
-                        await sendTelegramMessage(messages[i]);
-                        console.log(`Telegram: Часть ${i + 1}/${messages.length} отправлена успешно`);
-                        telegramSuccess = true;
-                    } catch (error) {
-                        console.error(`Telegram: Ошибка отправки части ${i + 1}:`, error);
+                    if (messages[i].trim()) { // Проверяем, что сообщение не пустое
+                        try {
+                            await sendTelegramMessage(messages[i]);
+                            console.log(`Telegram: Часть ${i + 1}/${messages.length} отправлена успешно`);
+                            telegramSuccess = true;
+                        } catch (error) {
+                            console.error(`Telegram: Ошибка отправки части ${i + 1}:`, error);
+                        }
                     }
                 }
 
