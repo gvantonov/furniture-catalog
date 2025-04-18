@@ -31,7 +31,7 @@ const categories = {
     'modern_expensive': ['105', '101', '98', '97', '96', '40', '45', '49', '18'],
     'modern_attribution': ['99', '80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2'],
     'sofas': ['70', '71', '72', '73', '74', '75', '76', '77', '78', '79'],
-    'modern_sofas': ['6', '9', '24', '25', '27', '28', '29', '30', '31', '54', '55', '56', '57', '58', '59', '60', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '87', '91', '92', '93', '94', ]
+    'modern_sofas': ['6', '9', '24', '25', '27', '28', '29', '30', '31', '54', '55', '56', '57', '58', '59', '60', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '87', '91', '92', '93', '94']
 };
 
 // Получение категории из URL
@@ -107,6 +107,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 "Статус": "",
                 "Количество, шт.": "",
                 "Оценка (агент TwoTables), за 1 шт.": "",
+                "Размеры (ВхШхГ)": "",
+                "Наименование": "",
+                "Гарнитур": "",
+                "Материалы": "",
                 "data-prefix": 'imgsklad' + (parseInt(item['№']) < 10 ? parseInt(item['№']) : item['№'].padStart(3, '0')),
                 "source": "warehouse"
             }));
@@ -166,9 +170,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let headers = [];
     if (isWarehousePage) {
         headers = ['№', 'Название', 'Фото'];
+    } else if (isSurveyPage) {
+        headers = ['№№', 'Фото', 'Название', 'Количество, шт.', 'Размеры (ВхШхГ)', 'Наименование', 'Гарнитур', 'На продажу', 'Ценный предмет'];
     } else {
         headers = Object.keys(catalogData[0] || {}).filter(header => header !== 'data-prefix' && header !== 'Пользовательская оценка');
-        if (isModernSofasPage || isSurveyPage) {
+        if (isModernSofasPage) {
             headers = [...headers, 'На продажу', 'Ценный предмет'];
         } else {
             headers = [...headers, 'Пользовательская оценка'];
@@ -206,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const imageList = imageData[prefix] || [];
                 img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
                 td.appendChild(img);
-            } else if (header === 'Оценка (агент TwoTables), за 1 шт.' && !isWarehousePage) {
+            } else if (header === 'Оценка (агент TwoTables), за 1 шт.' && !isWarehousePage && !isSurveyPage) {
                 const cost = item[header] || 0;
                 td.textContent = cost > 0 ? cost.toLocaleString('ru-RU') + ' ₽' : '';
                 td.style.textAlign = 'right';
@@ -251,8 +257,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         tbody.appendChild(row);
     });
 
-    // Добавление итоговой строки (только для страниц, кроме warehouse.html)
-    if (!isWarehousePage) {
+    // Добавление итоговой строки (только для страниц, кроме warehouse.html и survey.html)
+    if (!isWarehousePage && !isSurveyPage) {
         const totalRow = document.createElement('tr');
         const totalLabelCell = document.createElement('td');
         totalLabelCell.colSpan = headers.length - 1;
