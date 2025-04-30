@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Фильтрация данных по категории (только для страниц, кроме warehouse.html, survey.html и modern_sofas.html)
     if (!isWarehousePage && !isSurveyPage && !isModernSofasPage && category !== 'all') {
         const allowedItems = categories[category] || [];
-        furnitureData = filter(item => allowedItems.includes(item['№№']));
+        furnitureData = furnitureData.filter(item => allowedItems.includes(String(item['№№'])));
     }
 
     // Загрузка изображений
