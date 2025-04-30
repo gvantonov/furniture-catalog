@@ -544,4 +544,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             mainImage.msRequestFullscreen();
         }
     });
+
+// Динамическое выделение активной вкладки
+const currentPath = window.location.pathname.split('/').pop();
+const tabs = document.querySelectorAll('.tab');
+
+tabs.forEach(tab => {
+    const href = tab.getAttribute('href');
+    const tabPath = href.split('/').pop().split('?')[0]; // Учитываем только имя файла
+
+    if (currentPath === tabPath) {
+        tab.classList.add('active');
+    } else {
+        tab.classList.remove('active');
+    }
 });
+}); // Закрывающая скобка для document.addEventListener
