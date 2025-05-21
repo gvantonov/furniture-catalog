@@ -6,7 +6,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
     authDomain: "furniture-catalog-35e3e.firebaseapp.com",
     projectId: "furniture-catalog-35e3e",
-    storageBucket: "furniture-catalog-35e3e.firebastorage.app",
+    storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
     messagingSenderId: "705330640295",
     appId: "1:705330640295:web:055306fbfc3f95c36cb282",
     measurementId: "G-98YM4XPHN7"
@@ -38,7 +38,7 @@ const for_sale_ik_items = [
     { id: '6', source: 'Modern Sofas' }, { id: '7', source: 'Modern Sofas' }, { id: '8', source: 'Склад' },
     { id: '11', source: 'Склад' }, { id: '12', source: 'Склад' }, { id: '24', source: 'Modern Sofas' },
     { id: '25', source: 'Modern Sofas' }, { id: '27', source: 'Modern Sofas' }, { id: '28', source: 'Modern Sofas' },
-    { id: '29', source: 'Modern Sofas' }, { id: '30', source: 'Modern Sofas' }, { id: '31', source: 'Modern Sofas' },
+    { id: '29', source: 'Modern Sofas' }, { id: '30', 'Modern Sofas' }, { id: '31', source: 'Modern Sofas' },
     { id: '32', source: 'Склад' }, { id: '50', source: 'Склад' }, { id: '51', source: 'Склад' },
     { id: '57', source: 'Склад' }, { id: '58', source: 'Modern Sofas' }, { id: '58', source: 'Склад' },
     { id: '59', source: 'Modern Sofas' }, { id: '60', source: 'Modern Sofas' }, { id: '62', source: 'Modern Sofas' },
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
         const th = document.createElement('th');
-        if (header === 'Оценка (агент TwoTables), за 1шт.') {
+        if (header === 'Оценка (агент TwoTables), за 1 шт.') {
             th.textContent = 'Оценка (агент TwoTables)';
         } else {
             th.textContent = header;
@@ -527,20 +527,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     function updateGallery() {
-        mainImage.src = images[currentIndex];
+        mainImage.src = images[currentIndex] || 'img/placeholder.webp';
         thumbnailGallery.innerHTML = '';
-        images.forEach((imgSrc, index) => {
-            const img = document.createElement('img');
-            img.src = imgSrc;
-            if (index === currentIndex) {
-                img.classList.add('active');
-            }
-            img.addEventListener('click', () => {
-                currentIndex = index;
-                updateGallery();
+        if (images.length > 0) {
+            thumbnailGallery.className = 'thumbnail-gallery'; // Убедимся, что класс применяется
+            images.forEach((imgSrc, index) => {
+                const img = document.createElement('img');
+                img.src = imgSrc || 'img/placeholder.webp';
+                img.className = 'thumbnail-gallery img';
+                if (index === currentIndex) {
+                    img.classList.add('active');
+                }
+                img.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateGallery();
+                });
+                thumbnailGallery.appendChild(img);
             });
-            thumbnailGallery.appendChild(img);
-        });
+        }
         arrowLeft.style.display = images.length > 1 && currentIndex > 0 ? 'block' : 'none';
         arrowRight.style.display = images.length > 1 && currentIndex < images.length - 1 ? 'block' : 'none';
     }

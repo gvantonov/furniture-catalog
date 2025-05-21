@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="survey-page">
+    <!-- Фиксированный заголовок и меню вкладок -->
     <header class="fixed-header">
         <h1>На продажу (предложение ИК)</h1>
         <nav>
@@ -20,11 +21,12 @@
                 <li><a href="modern_sofas.html?category=modern_sofas" class="tab">Современная мебель и диваны</a></li>
                 <li><a href="warehouse.html" class="tab">Мебель на складе ОСЦ</a></li>
                 <li><a href="survey.html" class="tab">Опрос</a></li>
-                <li><a href="for_sale_ik.html" class="tab active">На продажу (предложение ИК)</a></li>
+                <li><a href="for_sale_ik.html" class="tab">На продажу (предложение ИК)</a></li>
             </ul>
         </nav>
     </header>
 
+    <!-- Основной контент -->
     <main class="content">
         <div class="container">
             <table id="furnitureTable">
@@ -34,12 +36,14 @@
             </table>
         </div>
 
+        <!-- Кнопка "Сохранить" и текст -->
         <div class="floating-save">
             <button id="saveButton" class="save-btn">Сохранить</button>
             <p class="save-note">Нажмите Сохранить после Вашего выбора</p>
         </div>
     </main>
 
+    <!-- Модальное окно для галереи -->
     <div id="galleryModal" class="modal">
         <div class="modal-content">
             <span class="close">×</span>
@@ -51,6 +55,7 @@
         </div>
     </div>
 
+    <!-- Модальное окно для подтверждения -->
     <div id="confirmModal" class="modal">
         <div class="modal-content">
             <span class="close">×</span>
@@ -60,6 +65,7 @@
         </div>
     </div>
 
+    <!-- Модальное окно для ввода имени и телефона -->
     <div id="userInfoModal" class="modal">
         <div class="modal-content">
             <span class="close">×</span>
