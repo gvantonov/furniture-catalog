@@ -6,49 +6,55 @@
     <title>На продажу (предложение ИК)</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <header>
+<body class="survey-page">
+    <header class="fixed-header">
         <h1>На продажу (предложение ИК)</h1>
         <nav>
-      <li><a href="index.html" class="tab">Все предметы в Барвихе</a></li>
-                <li><a href="vintage_antique.html?category=vintage_antique" class="tab">Винтажные/антикварные</a></li>
-                <li><a href="vintage_possible.html?category=vintage_possible" class="tab">Вероятно, винтажная</a></li>
-                <li><a href="modern_expensive.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
-                <li><a href="modern_attribution.html?category=modern_attribution" class="tab">Современная (атрибуция)</a></li>
-                <li><a href="sofas.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
+            <ul class="tabs">
+                <li><a href="index.html" class="tab">Все предметы в Барвихе</a></li>
+                <li><a href="catalog.html?category=vintage_antique" class="tab">Винтажные/антикварные</a></li>
+                <li><a href="catalog.html?category=vintage_possible" class="tab">Вероятно, винтажная</a></li>
+                <li><a href="catalog.html?category=modern_expensive" class="tab">Современная (более 150 тыс. ₽)</a></li>
+                <li><a href="catalog.html?category=modern_attribution" class="tab">Современная (атрибуция)</a></li>
+                <li><a href="catalog.html?category=sofas" class="tab">Диваны (40–150 тыс. ₽)</a></li>
                 <li><a href="modern_sofas.html?category=modern_sofas" class="tab">Современная мебель и диваны</a></li>
                 <li><a href="warehouse.html" class="tab">Мебель на складе ОСЦ</a></li>
                 <li><a href="survey.html" class="tab">Опрос</a></li>
-             <li><a href="for_sale_ik.html" class="tab">На продажу (предложение ИК)</a><li>
+                <li><a href="for_sale_ik.html" class="tab active">На продажу (предложение ИК)</a></li>
+            </ul>
         </nav>
     </header>
 
-    <main>
-        <table id="furnitureTable">
-            <thead id="tableHeader"></thead>
-            <tbody id="tableBody"></tbody>
-            <tfoot id="tableFooter"></tfoot>
-        </table>
+    <main class="content">
+        <div class="container">
+            <table id="furnitureTable">
+                <thead id="tableHeader"></thead>
+                <tbody id="tableBody"></tbody>
+                <tfoot id="tableFooter"></tfoot>
+            </table>
+        </div>
 
-        <button id="saveButton">Сохранить</button>
-        <p>Нажмите Сохранить после Вашего выбора</p>
+        <div class="floating-save">
+            <button id="saveButton" class="save-btn">Сохранить</button>
+            <p class="save-note">Нажмите Сохранить после Вашего выбора</p>
+        </div>
     </main>
 
     <div id="galleryModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <img id="mainImage" src="" alt="Main Image">
             <div id="thumbnailGallery"></div>
-            <button id="arrowLeft">&lt;</button>
-            <button id="arrowRight">&gt;</button>
-            <button id="fullscreenBtn">Полноэкранный режим</button>
+            <button id="arrowLeft" class="arrow arrow-left"><</button>
+            <button id="arrowRight" class="arrow arrow-right">></button>
+            <button id="fullscreenBtn" class="fullscreen-btn">Полноэкранный режим</button>
         </div>
     </div>
 
     <div id="confirmModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Вы уверены, что хотите сохранить изменения?</p>
+            <span class="close">×</span>
+            <h2>Вы уверены, что хотите сохранить изменения?</h2>
             <button id="confirmYes">Да</button>
             <button id="confirmNo">Нет</button>
         </div>
@@ -56,7 +62,7 @@
 
     <div id="userInfoModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <form id="userInfoForm">
                 <label for="userName">Ваше имя:</label>
                 <input type="text" id="userName" required>
