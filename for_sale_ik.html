@@ -5,6 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>На продажу (предложение ИК)</title>
     <link rel="stylesheet" href="styles.css">
+<style>
+    #galleryModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    #mainImage {
+        max-width: 90%;
+        max-height: 90vh;
+        object-fit: contain;
+    }
+    #thumbnailGallery {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+        overflow-x: auto;
+    }
+    #thumbnailGallery img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    #thumbnailGallery img.active {
+        border: 2px solid #007bff;
+    }
+    .arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 40px;
+        color: white;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    .arrow-left {
+        left: 10px;
+    }
+    .arrow-right {
+        right: 10px;
+    }
+    .fullscreen-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    .fullscreen-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
 </head>
 <body class="survey-page">
     <header class="fixed-header">
