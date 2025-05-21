@@ -1,4 +1,3 @@
-// Импорт Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
@@ -7,7 +6,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDyLLgQeRNghUjsCF4aGnwVvrvPfuwf0r8",
     authDomain: "furniture-catalog-35e3e.firebaseapp.com",
     projectId: "furniture-catalog-35e3e",
-    storageBucket: "furniture-catalog-35e3e.firebasestorage.app",
+    storageBucket: "furniture-catalog-35e3e.firebastorage.app",
     messagingSenderId: "705330640295",
     appId: "1:705330640295:web:055306fbfc3f95c36cb282",
     measurementId: "G-98YM4XPHN7"
@@ -33,15 +32,36 @@ const categories = {
     'modern_sofas': ['6', '9', '24', '25', '27', '28', '29', '30', '31', '54', '55', '56', '57', '58', '59', '60', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '87', '91', '92', '93', '94', '80', '61', '42', '41', '36', '35', '26', '7', '4', '3', '2']
 };
 
+// Определение предметов для страницы "На продажу (предложение ИК)"
+const for_sale_ik_items = [
+    { id: '2', source: 'Modern Sofas' }, { id: '3', source: 'Modern Sofas' }, { id: '4', source: 'Modern Sofas' },
+    { id: '6', source: 'Modern Sofas' }, { id: '7', source: 'Modern Sofas' }, { id: '8', source: 'Склад' },
+    { id: '11', source: 'Склад' }, { id: '12', source: 'Склад' }, { id: '24', source: 'Modern Sofas' },
+    { id: '25', source: 'Modern Sofas' }, { id: '27', source: 'Modern Sofas' }, { id: '28', source: 'Modern Sofas' },
+    { id: '29', source: 'Modern Sofas' }, { id: '30', source: 'Modern Sofas' }, { id: '31', source: 'Modern Sofas' },
+    { id: '32', source: 'Склад' }, { id: '50', source: 'Склад' }, { id: '51', source: 'Склад' },
+    { id: '57', source: 'Склад' }, { id: '58', source: 'Modern Sofas' }, { id: '58', source: 'Склад' },
+    { id: '59', source: 'Modern Sofas' }, { id: '60', source: 'Modern Sofas' }, { id: '62', source: 'Modern Sofas' },
+    { id: '63', source: 'Modern Sofas' }, { id: '65', source: 'Modern Sofas' }, { id: '66', source: 'Modern Sofas' },
+    { id: '67', source: 'Modern Sofas' }, { id: '69', source: 'Склад' }, { id: '71', source: 'Modern Sofas' },
+    { id: '72', source: 'Modern Sofas' }, { id: '76', source: 'Склад' }, { id: '79', source: 'Modern Sofas' },
+    { id: '79', source: 'Склад' }, { id: '91', source: 'Склад' }, { id: '93', source: 'Склад' },
+    { id: '114', source: 'Склад' }, { id: '116', source: 'Склад' }, { id: '133', source: 'Склад' },
+    { id: '198', source: 'Склад' }, { id: '199', source: 'Склад' }, { id: '213', source: 'Склад' },
+    { id: '214', source: 'Склад' }, { id: '217', source: 'Склад' }, { id: '218', source: 'Склад' },
+    { id: '227', source: 'Склад' }
+];
+
 // Получение категории из URL
 const urlParams = new URLSearchParams(window.location.search);
 const category = urlParams.get('category') || 'all';
 
-// Проверка, является ли текущая страница modern_sofas, warehouse или survey
+// Проверка, является ли текущая страница modern_sofas, warehouse, survey или for_sale_ik
 const currentPage = window.location.pathname.split('/').pop();
 const isModernSofasPage = category === 'modern_sofas';
 const isWarehousePage = currentPage === 'warehouse.html';
 const isSurveyPage = currentPage === 'survey.html';
+const isForSaleIkPage = currentPage === 'for_sale_ik.html';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const table = document.getElementById('furnitureTable');
@@ -82,15 +102,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Ошибка загрузки furniture_catalog.json:', error);
     }
 
-    // Фильтрация данных для modern_sofas (для survey.html и modern_sofas.html)
+    // Фильтрация данных для modern_sofas (для survey.html, modern_sofas.html и for_sale_ik.html)
     let modernSofasData = [];
-    if (isModernSofasPage || isSurveyPage) {
+    if (isModernSofasPage || isSurveyPage || isForSaleIkPage) {
         const allowedItems = categories['modern_sofas'] || [];
         modernSofasData = catalogData.filter(item => allowedItems.includes(item['№№']));
     }
 
-    // Загрузка warehouse_data.json (для survey.html и warehouse.html)
-    if (isSurveyPage || isWarehousePage) {
+    // Загрузка warehouse_data.json (для survey.html, warehouse.html и for_sale_ik.html)
+    if (isSurveyPage || isWarehousePage || isForSaleIkPage) {
         try {
             const response = await fetch('warehouse_data.json');
             if (!response.ok) {
@@ -118,19 +138,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Объединяем данные для survey.html
+    // Объединяем данные
     if (isSurveyPage) {
         furnitureData = [...modernSofasData, ...warehouseData];
     } else if (isWarehousePage) {
         furnitureData = warehouseData;
     } else if (isModernSofasPage) {
         furnitureData = modernSofasData;
+    } else if (isForSaleIkPage) {
+        // Фильтрация для страницы "На продажу (предложение ИК)"
+        furnitureData = [];
+        for_sale_ik_items.forEach(({ id, source }) => {
+            if (source === 'Modern Sofas') {
+                const item = modernSofasData.find(item => item['№№'] === id);
+                if (item) {
+                    furnitureData.push({ ...item, source: 'Modern Sofas' });
+                }
+            } else if (source === 'Склад') {
+                const item = warehouseData.find(item => item['№№'] === id);
+                if (item) {
+                    furnitureData.push({ ...item, source: 'warehouse' });
+                }
+            }
+        });
     } else {
         furnitureData = catalogData;
     }
 
-    // Фильтрация данных по категории (только для страниц, кроме warehouse.html, survey.html и modern_sofas.html)
-    if (!isWarehousePage && !isSurveyPage && !isModernSofasPage && category !== 'all') {
+    // Фильтрация данных по категории (только для страниц, кроме warehouse.html, survey.html, modern_sofas.html и for_sale_ik.html)
+    if (!isWarehousePage && !isSurveyPage && !isModernSofasPage && !isForSaleIkPage && category !== 'all') {
         const allowedItems = categories[category] || [];
         furnitureData = furnitureData.filter(item => allowedItems.includes(String(item['№№'])));
     }
@@ -150,8 +186,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         imageData = {};
     }
 
-    // Загрузка warehouse_images.json для survey.html (дополнительно)
-    if (isSurveyPage) {
+    // Загрузка warehouse_images.json для survey.html и for_sale_ik.html (дополнительно)
+    if (isSurveyPage || isForSaleIkPage) {
         try {
             const response = await fetch('warehouse_images.json');
             if (!response.ok) {
@@ -169,7 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let headers = [];
     if (isWarehousePage) {
         headers = ['№', 'Название', 'Фото'];
-    } else if (isSurveyPage) {
+    } else if (isSurveyPage || isForSaleIkPage) {
         headers = ['№№', 'Фото', 'Название', 'Количество, шт.', 'Размеры (ВхШхГ)', 'Наименование', 'Гарнитур', 'На продажу', 'Ценный предмет'];
     } else {
         headers = Object.keys(catalogData[0] || {}).filter(header => header !== 'data-prefix' && header !== 'Пользовательская оценка');
@@ -183,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
         const th = document.createElement('th');
-        if (header === 'Оценка (агент TwoTables), за 1 шт.') {
+        if (header === 'Оценка (агент TwoTables), за 1шт.') {
             th.textContent = 'Оценка (агент TwoTables)';
         } else {
             th.textContent = header;
@@ -211,13 +247,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const imageList = imageData[prefix] || [];
                 img.src = imageList.length > 0 ? imageList[0] : 'img/placeholder.webp';
                 td.appendChild(img);
-            } else if (header === 'Оценка (агент TwoTables), за 1 шт.' && !isWarehousePage && !isSurveyPage) {
+            } else if (header === 'Оценка (агент TwoTables), за 1 шт.' && !isWarehousePage && !isSurveyPage && !isForSaleIkPage) {
                 const cost = item[header] || 0;
                 td.textContent = cost > 0 ? cost.toLocaleString('ru-RU') + ' ₽' : '';
                 td.style.textAlign = 'right';
                 const quantity = parseInt(item['Количество, шт.']) || 1;
                 totalCost += cost * quantity;
-            } else if (header === 'На продажу' && (isModernSofasPage || isSurveyPage)) {
+            } else if (header === 'На продажу' && (isModernSofasPage || isSurveyPage || isForSaleIkPage)) {
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'for-sale';
@@ -227,7 +263,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 td.appendChild(checkbox);
                 td.style.textAlign = 'center';
-            } else if (header === 'Ценный предмет' && (isModernSofasPage || isSurveyPage)) {
+            } else if (header === 'Ценный предмет' && (isModernSofasPage || isSurveyPage || isForSaleIkPage)) {
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'valuable';
@@ -237,7 +273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 td.appendChild(checkbox);
                 td.style.textAlign = 'center';
-            } else if (header === 'Пользовательская оценка' && !isModernSofasPage && !isSurveyPage && !isWarehousePage) {
+            } else if (header === 'Пользовательская оценка' && !isModernSofasPage && !isSurveyPage && !isWarehousePage && !isForSaleIkPage) {
                 td.className = 'editable';
                 td.setAttribute('contenteditable', 'true');
                 td.textContent = item[header] || '';
@@ -256,8 +292,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         tbody.appendChild(row);
     });
 
-    // Добавление итоговой строки (только для страниц, кроме warehouse.html и survey.html)
-    if (!isWarehousePage && !isSurveyPage) {
+    // Добавление итоговой строки (только для страниц, кроме warehouse.html, survey.html и for_sale_ik.html)
+    if (!isWarehousePage && !isSurveyPage && !isForSaleIkPage) {
         const totalRow = document.createElement('tr');
         const totalLabelCell = document.createElement('td');
         totalLabelCell.colSpan = headers.length - 1;
@@ -273,7 +309,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         tfoot.appendChild(totalRow);
     }
 
-    // Открытие модального окна для подтверждения (только для modern_sofas и survey)
+    // Открытие модального окна для подтверждения (только для modern_sofas, survey и for_sale_ik)
     if (saveButton) {
         saveButton.addEventListener('click', () => {
             confirmModal.style.display = 'flex';
@@ -349,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Формирование сообщения для Telegram
                 const moscowTime = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow', hour12: false });
                 const itemsWithSelection = furnitureData.filter(item => item['На продажу'] || item['Ценный предмет']);
-                let telegramMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName}${userPhone ? ` (${userPhone})` : ''}\n`;
+                let telegramMessage = `🔔 Новые данные по ${isForSaleIkPage ? 'предложению ИК' : 'опросу (Modern Sofas + Warehouse)'} от ${userName}${userPhone ? ` (${userPhone})` : ''}\n`;
                 telegramMessage += `Время (Москва): ${moscowTime}\n\n`;
                 if (itemsWithSelection.length > 0) {
                     itemsWithSelection.forEach(item => {
@@ -369,7 +405,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (telegramMessage.length <= maxMessageLength) {
                     messages.push(telegramMessage);
                 } else {
-                    let currentMessage = `🔔 Новые данные по опросу (Modern Sofas + Warehouse) от ${userName}${userPhone ? ` (${userPhone})` : ''}\n`;
+                    let currentMessage = `🔔 Новые данные по ${isForSaleIkPage ? 'предложению ИК' : 'опросу (Modern Sofas + Warehouse)'} от ${userName}${userPhone ? ` (${userPhone})` : ''}\n`;
                     currentMessage += `Время (Москва): ${moscowTime}\n\n`;
                     let currentLength = currentMessage.length;
                     let itemMessages = itemsWithSelection.map(item => {
@@ -545,18 +581,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-// Динамическое выделение активной вкладки
-const currentPath = window.location.pathname.split('/').pop();
-const tabs = document.querySelectorAll('.tab');
+    // Динамическое выделение активной вкладки
+    const currentPath = window.location.pathname.split('/').pop();
+    const tabs = document.querySelectorAll('.tab');
 
-tabs.forEach(tab => {
-    const href = tab.getAttribute('href');
-    const tabPath = href.split('/').pop().split('?')[0]; // Учитываем только имя файла
+    tabs.forEach(tab => {
+        const href = tab.getAttribute('href');
+        const tabPath = href.split('/').pop().split('?')[0]; // Учитываем только имя файла
 
-    if (currentPath === tabPath) {
-        tab.classList.add('active');
-    } else {
-        tab.classList.remove('active');
-    }
+        if (currentPath === tabPath) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
 });
-}); // Закрывающая скобка для document.addEventListener
